@@ -74,7 +74,9 @@ export default function FAQAccordion() {
         {faqs.map((item) => (
           <AccordionItem value={item.id} key={item.id} className="py-2 ">
             <AccordionTrigger className="py-2 text-[15px] cursor-pointer leading-6 hover:no-underline">
-              <span className="text-lg font-medium">{item.title}</span>
+              <span className="text-base sm:text-lg font-medium">
+                {item.title}
+              </span>
             </AccordionTrigger>
             <AccordionContent className="text-muted-foreground pb-2">
               <span className="text-base">{item.content}</span>

@@ -5,7 +5,7 @@ import { TiDelete } from "react-icons/ti";
 
 const CartItem = () => {
   return (
-    <div className=" border-b mx-4 pb-4 flex gap-3 items-center">
+    <div className=" border-b mx-4 py-2 sm:py-3 flex gap-3 items-center">
       <div className="w-20 h-20">
         <img
           src={productImg}

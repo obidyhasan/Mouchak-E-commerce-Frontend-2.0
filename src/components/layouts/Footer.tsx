@@ -11,7 +11,7 @@ const Footer = () => {
               <div className="flex justify-center lg:justify-start">
                 <Logo />
               </div>
-              <p className="mx-auto mt-6 max-w-md text-center leading-relaxed text-muted-foreground lg:text-left">
+              <p className="mx-auto mt-6 max-w-md leading-relaxed text-muted-foreground text-sm sm:text-base lg:text-left text-justify">
                 Pure, natural honey delivered from the hive to your home. Taste
                 the sweetness of nature with our premium, sustainably sourced
                 honey products.
