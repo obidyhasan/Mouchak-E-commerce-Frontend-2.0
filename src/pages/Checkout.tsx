@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { divisions } from "@/constants/divisions";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router";
 
@@ -118,7 +119,7 @@ const Checkout = () => {
                           />
                         </FormControl>
                         <FormDescription className="sr-only">
-                          This is your public display email.
+                          This is your phone number
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -134,24 +135,20 @@ const Checkout = () => {
                     name="phone"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="pb-1">District</FormLabel>
+                        <FormLabel className="pb-1">Division</FormLabel>
                         <FormControl className="">
                           <Select {...field}>
                             <FormControl className="w-full">
                               <SelectTrigger>
-                                <SelectValue placeholder="Select your District" />
+                                <SelectValue placeholder="Select your Division" />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="m@example.com">
-                                m@example.com
-                              </SelectItem>
-                              <SelectItem value="m@google.com">
-                                m@google.com
-                              </SelectItem>
-                              <SelectItem value="m@support.com">
-                                m@support.com
-                              </SelectItem>
+                              {divisions.map((division, idx) => (
+                                <SelectItem key={idx} value={division}>
+                                  {division}
+                                </SelectItem>
+                              ))}
                             </SelectContent>
                           </Select>
                         </FormControl>

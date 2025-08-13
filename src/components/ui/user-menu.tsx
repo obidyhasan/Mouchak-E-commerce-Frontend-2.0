@@ -1,4 +1,9 @@
-import { Layers2Icon, LogOutIcon, UserPenIcon } from "lucide-react";
+import {
+  Layers2Icon,
+  LayoutDashboard,
+  LogOutIcon,
+  UserPenIcon,
+} from "lucide-react";
 
 import { LuUserRound } from "react-icons/lu";
 import {
@@ -31,6 +36,20 @@ export default function UserMenu() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
+          <DropdownMenuGroup>
+            <DropdownMenuItem>
+              <Link className="w-full" to={"/admin"}>
+                <div className="flex gap-2 w-full">
+                  <LayoutDashboard
+                    size={16}
+                    className="opacity-60"
+                    aria-hidden="true"
+                  />
+                  <span>Dashboard</span>
+                </div>
+              </Link>
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
           <DropdownMenuGroup>
             <DropdownMenuItem>
               <Link className="w-full" to={"/me"}>

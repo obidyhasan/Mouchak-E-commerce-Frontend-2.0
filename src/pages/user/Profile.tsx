@@ -28,6 +28,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { divisions } from "@/constants/divisions";
 import { useForm } from "react-hook-form";
 
 const Profile = () => {
@@ -57,7 +58,7 @@ const Profile = () => {
               <h2>01925658596</h2>
             </div>
             <div className="border-b pb-2">
-              <p className="text-sm mb-1 text-muted-foreground">District</p>
+              <p className="text-sm mb-1 text-muted-foreground">Division</p>
               <h2>Khulna</h2>
             </div>
             <div className="">
@@ -133,24 +134,20 @@ const Profile = () => {
                         name="phone"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="pb-1">District</FormLabel>
+                            <FormLabel className="pb-1">Division</FormLabel>
                             <FormControl className="">
                               <Select {...field}>
                                 <FormControl className="w-full">
                                   <SelectTrigger>
-                                    <SelectValue placeholder="Select your District" />
+                                    <SelectValue placeholder="Select your Division" />
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  <SelectItem value="m@example.com">
-                                    m@example.com
-                                  </SelectItem>
-                                  <SelectItem value="m@google.com">
-                                    m@google.com
-                                  </SelectItem>
-                                  <SelectItem value="m@support.com">
-                                    m@support.com
-                                  </SelectItem>
+                                  {divisions.map((division, idx) => (
+                                    <SelectItem key={idx} value={division}>
+                                      {division}
+                                    </SelectItem>
+                                  ))}
                                 </SelectContent>
                               </Select>
                             </FormControl>
