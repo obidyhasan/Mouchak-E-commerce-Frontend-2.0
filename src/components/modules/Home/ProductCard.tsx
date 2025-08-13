@@ -5,7 +5,10 @@ import productImg from "@/assets/images/honey-1.webp";
 const ProductCard = () => {
   return (
     <div>
-      <Link to="/" className="group rounded-sm relative block overflow-hidden">
+      <Link
+        to="/product-details"
+        className="group rounded-sm relative block overflow-hidden"
+      >
         <img
           src={productImg}
           alt=""
@@ -16,7 +19,7 @@ const ProductCard = () => {
           <div className="text-center">
             <Badge
               variant="outline"
-              className="text-xs sm:text-sm rounded-full mx-auto w-max"
+              className="text-xs rounded-full mx-auto w-max"
             >
               Badge
             </Badge>

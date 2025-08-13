@@ -10,6 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Link } from "react-router";
 
 export default function UserMenu() {
   return (
@@ -32,17 +33,29 @@ export default function UserMenu() {
         <DropdownMenuGroup>
           <DropdownMenuGroup>
             <DropdownMenuItem>
-              <UserPenIcon
-                size={16}
-                className="opacity-60"
-                aria-hidden="true"
-              />
-              <span>Profile</span>
+              <Link className="w-full" to={"/me"}>
+                <div className="flex gap-2 w-full">
+                  <UserPenIcon
+                    size={16}
+                    className="opacity-60"
+                    aria-hidden="true"
+                  />
+                  <span>Profile</span>
+                </div>
+              </Link>
             </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuItem>
-            <Layers2Icon size={16} className="opacity-60" aria-hidden="true" />
-            <span>Orders</span>
+            <Link className="w-full" to={"/me/orders"}>
+              <div className="flex gap-2 w-full">
+                <Layers2Icon
+                  size={16}
+                  className="opacity-60"
+                  aria-hidden="true"
+                />
+                <span>Orders</span>
+              </div>
+            </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>
 

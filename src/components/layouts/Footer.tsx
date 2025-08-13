@@ -5,7 +5,7 @@ const Footer = () => {
   return (
     <div>
       <footer className="bg-background text-foreground border-t border-border">
-        <div className="mx-auto max-w-7xl px-4 py-10 pt-16">
+        <div className="mx-auto max-w-7xl px-4 py-7 pt-10">
           <div className="lg:flex lg:items-end lg:justify-between">
             <div>
               <div className="flex justify-center lg:justify-start">
@@ -46,7 +46,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          <p className="mt-12 text-center text-sm text-muted-foreground lg:text-right">
+          <p className="mt-6 text-center text-sm text-muted-foreground lg:text-right">
             Copyright &copy; Mouchak 2025. All rights reserved.
           </p>
         </div>
