@@ -1,4 +1,5 @@
 import App from "@/App";
+import Checkout from "@/pages/Checkout";
 import Home from "@/pages/Home";
 import Login from "@/pages/Login";
 import Verify from "@/pages/Verify";
@@ -12,6 +13,10 @@ export const router = createBrowserRouter([
       {
         Component: Home,
         path: "/",
+      },
+      {
+        Component: Checkout,
+        path: "/checkout",
       },
     ],
   },

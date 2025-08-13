@@ -11,8 +11,15 @@ import {
 } from "@/components/ui/sheet";
 import { FiShoppingCart } from "react-icons/fi";
 import CartItem from "./CartItem";
+import { useNavigate } from "react-router";
 
 export function CartSidebar() {
+  const navigate = useNavigate();
+
+  const handleCheckoutButton = () => {
+    navigate("/checkout");
+  };
+
   return (
     <Sheet>
       {/* Cart icon in navbar triggers the Sheet */}
@@ -46,7 +53,9 @@ export function CartSidebar() {
           <div className="flex justify-between items-center font-semibold">
             <span>Total</span> <span>Tk. 1200</span>
           </div>
-          <Button type="submit">Checkout</Button>
+          <Button onClick={handleCheckoutButton} type="submit">
+            Checkout
+          </Button>
           {/* <SheetClose asChild>
             <Button variant="outline">Close</Button>
           </SheetClose> */}
