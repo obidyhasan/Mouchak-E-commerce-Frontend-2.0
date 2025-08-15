@@ -8,5 +8,9 @@ export interface IVerifyOtp {
 }
 
 export interface ILogin {
+  name?: string;
   email: string;
+  phone?: string;
+  division?: string;
+  address?: string;
 }

@@ -11,7 +11,6 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -22,97 +21,70 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { cn } from "@/lib/utils";
 import logo from "@/assets/icons/logo-icon.svg";
 import { Dot } from "lucide-react";
-
+import z from "zod";
 import { useForm } from "react-hook-form";
-import { useState } from "react";
-import { Link } from "react-router";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router";
+import { useVerifyOtpMutation } from "@/redux/features/auth/auth.api";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import type { IErrorResponse } from "@/types";
 
-// const formSchema = z.object({
-//   pin: z.string().min(6, {
-//     message: "Your one-time password must be 6 character.",
-//   }),
-// });
+const formSchema = z.object({
+  pin: z.string().min(6, {
+    message: "Your otp must be 6 character.",
+  }),
+});
 
 const Verify = () => {
-  // const location = useLocation();
-  // const navigate = useNavigate();
-  // const [email] = useState(location.state);
-  // const [confirmed, setConfirmed] = useState(false);
-  // const [sendOtp] = useSendOtpMutation();
-  // const [verifyOtp] = useVerifyOtpMutation();
-  const [timer] = useState(60);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [email] = useState(location.state);
+  const [verifyOtp] = useVerifyOtpMutation();
+  const [buttonDisable, setButtonDisable] = useState(false);
 
-  // const form = useForm<z.infer<typeof formSchema>>({
-  //   resolver: zodResolver(formSchema),
-  //   defaultValues: {
-  //     pin: "",
-  //   },
-  // });
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      pin: "",
+    },
+  });
 
-  const form = useForm();
+  // check if user have validate route
+  useEffect(() => {
+    if (!email) {
+      navigate("/", { replace: true });
+    }
+  }, [email, navigate]);
 
-  // const handleSendOTP = async () => {
-  //   const toastId = toast.loading("Sending OTP to your email.");
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    setButtonDisable(true);
+    const toastId = toast.loading("Verifying OTP...");
+    const userInfo = {
+      email,
+      otp: data.pin,
+    };
 
-  //   try {
-  //     const res = await sendOtp({ email: email }).unwrap();
-
-  //     if (res.success) {
-  //       toast.success("OTP sent", { id: toastId });
-  //       setConfirmed(true);
-  //       setTimer(60);
-  //     }
-  //   } catch (error: any) {
-  //     console.log(error);
-  //     toast.error(error?.data?.message, { id: toastId });
-  //   }
-  // };
-
-  // const onSubmit = async (data: z.infer<typeof formSchema>) => {
-  //   const toastId = toast.loading("Verifying OTP");
-  //   const userInfo = {
-  //     email,
-  //     otp: data.pin,
-  //   };
-
-  //   try {
-  //     const res = await verifyOtp(userInfo).unwrap();
-  //     if (res.success) {
-  //       toast.success("OTP verified", { id: toastId });
-  //       navigate("/login", { replace: true });
-  //     }
-  //   } catch (error: any) {
-  //     console.log(error);
-  //     toast.error(error?.data?.message, { id: toastId });
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   if (!email || !confirmed) {
-  //     return;
-  //   }
-
-  //   if (timer === 0) {
-  //     return;
-  //   }
-
-  //   const timerId = setInterval(() => {
-  //     setTimer((prev) => (prev > 0 ? prev - 1 : 0));
-  //     console.log("Tick", timer);
-  //   }, 1000);
-
-  //   return () => clearInterval(timerId);
-  // }, [email, confirmed, timer]);
-
-  // // check if user have validate route
-  // useEffect(() => {
-  //   if (!email) {
-  //     navigate("/", { replace: true });
-  //   }
-  // }, [email, navigate]);
+    try {
+      const res = await verifyOtp(userInfo).unwrap();
+      if (res.success) {
+        setButtonDisable(false);
+        toast.success("OTP verified", { id: toastId });
+        navigate("/", { replace: true });
+      }
+    } catch (err: any) {
+      console.error(err);
+      setButtonDisable(false);
+      toast.error(
+        (err?.data as IErrorResponse).message || "Something went wrong",
+        {
+          id: toastId,
+        }
+      );
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
@@ -122,15 +94,19 @@ const Verify = () => {
             <img src={logo} className="mx-auto mb-3" />
           </Link>
           <CardTitle className="text-xl text-center">Verify Email </CardTitle>
-          <CardDescription className="text-center">
+          <CardDescription className="text-center text-sm">
             Please enter the 6-digit code we sent to <br />{" "}
-            <span className="font-medium">email</span>
+            <span className="font-medium text-primary">{email}</span>
           </CardDescription>
         </CardHeader>
 
         <CardContent>
           <Form {...form}>
-            <form id="otp-form" className="space-y-6">
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              id="otp-form"
+              className="space-y-6"
+            >
               <FormField
                 control={form.control}
                 name="pin"
@@ -160,21 +136,7 @@ const Verify = () => {
                         </InputOTPGroup>
                       </InputOTP>
                     </FormControl>
-                    <FormDescription>
-                      <Button
-                        // onClick={handleSendOTP}
-                        type="button"
-                        variant="link"
-                        disabled={timer !== 0}
-                        className={cn("p-0 m-0", {
-                          "cursor-pointer": timer === 0,
-                          "text-gray-500": timer !== 0,
-                        })}
-                      >
-                        Resend OTP:
-                      </Button>
-                      <span className="pl-2">{timer}s</span>
-                    </FormDescription>
+
                     <FormMessage />
                   </FormItem>
                 )}
@@ -184,7 +146,7 @@ const Verify = () => {
         </CardContent>
 
         <CardFooter className="flex justify-end">
-          <Button form="otp-form" type="submit">
+          <Button form="otp-form" disabled={buttonDisable} type="submit">
             Submit
           </Button>
         </CardFooter>
