@@ -16,8 +16,21 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Link } from "react-router";
+import useUser from "@/hooks/userUser";
+import { Role } from "@/constants/role";
+import { authApi, useLogoutMutation } from "@/redux/features/auth/auth.api";
+import { useDispatch } from "react-redux";
 
 export default function UserMenu() {
+  const userInfo = useUser();
+  const [logout] = useLogoutMutation();
+  const dispatch = useDispatch();
+
+  const handleLogout = async () => {
+    await logout(undefined);
+    dispatch(authApi.util.resetApiState());
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -28,28 +41,31 @@ export default function UserMenu() {
       <DropdownMenuContent className="max-w-64" align="end">
         <DropdownMenuLabel className="flex min-w-0 flex-col">
           <span className="text-foreground truncate text-sm font-medium">
-            Keith Kennedy
+            {userInfo?.name}
           </span>
           <span className="text-muted-foreground truncate text-xs font-normal">
-            k.kennedy@originui.com
+            {userInfo?.email}
           </span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuGroup>
-            <DropdownMenuItem>
-              <Link className="w-full" to={"/admin"}>
-                <div className="flex gap-2 w-full">
-                  <LayoutDashboard
-                    size={16}
-                    className="opacity-60"
-                    aria-hidden="true"
-                  />
-                  <span>Dashboard</span>
-                </div>
-              </Link>
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
+          {userInfo?.role === Role.ADMIN ||
+            (userInfo?.role === Role.SUPER_ADMIN && (
+              <DropdownMenuGroup>
+                <DropdownMenuItem>
+                  <Link className="w-full" to={"/admin"}>
+                    <div className="flex gap-2 w-full">
+                      <LayoutDashboard
+                        size={16}
+                        className="opacity-60"
+                        aria-hidden="true"
+                      />
+                      <span>Dashboard</span>
+                    </div>
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            ))}
           <DropdownMenuGroup>
             <DropdownMenuItem>
               <Link className="w-full" to={"/me"}>
@@ -79,7 +95,7 @@ export default function UserMenu() {
         </DropdownMenuGroup>
 
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={handleLogout}>
           <LogOutIcon size={16} className="opacity-60" aria-hidden="true" />
           <span>Logout</span>
         </DropdownMenuItem>

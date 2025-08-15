@@ -14,8 +14,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { CartSidebar } from "../modules/Cart/CartSidebar";
+import useUser from "@/hooks/userUser";
+import { LuUserRound } from "react-icons/lu";
 
 // Navigation links array
 const navigationLinks = [
@@ -25,6 +27,13 @@ const navigationLinks = [
 ];
 
 export default function Navbar() {
+  const userInfo = useUser();
+  const navigate = useNavigate();
+
+  const goToLoginPage = () => {
+    navigate("/login");
+  };
+
   return (
     <header className="border-b z-50 bg-background sticky top-0">
       <div className="max-w-7xl mx-auto w-full px-4 flex h-16 items-center justify-between gap-4">
@@ -133,7 +142,18 @@ export default function Navbar() {
 
         {/* Right side: Actions */}
         <div className="flex flex-1 items-center justify-end">
-          <UserMenu />
+          {userInfo ? (
+            <UserMenu />
+          ) : (
+            <>
+              <div
+                onClick={goToLoginPage}
+                className="p-2 hover:text-primary cursor-pointer transition-colors duration-200 h-auto rounded-full hover:bg-transparent"
+              >
+                <LuUserRound className="w-5 h-5" />
+              </div>
+            </>
+          )}
           {/* Cart */}
           <CartSidebar />
         </div>
