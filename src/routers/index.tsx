@@ -10,6 +10,9 @@ import Verify from "@/pages/Verify";
 import { generateRoutes } from "@/utils/generateRoutes";
 import { createBrowserRouter, Navigate } from "react-router";
 import { adminSidebarItems } from "./adminSidebarItems";
+import Unauthorized from "@/pages/Unauthorized";
+import { withAuth } from "@/utils/withAuth";
+import { Role } from "@/constants/role";
 
 export const router = createBrowserRouter([
   {
@@ -29,17 +32,17 @@ export const router = createBrowserRouter([
         path: "/product-details",
       },
       {
-        Component: Profile,
+        Component: withAuth(Profile, ...Object.values(Role)),
         path: "/me",
       },
       {
-        Component: MyOrders,
+        Component: withAuth(MyOrders, ...Object.values(Role)),
         path: "/me/orders",
       },
     ],
   },
   {
-    Component: DashboardLayout,
+    Component: withAuth(DashboardLayout, Role.ADMIN, Role.SUPER_ADMIN),
     path: "/admin",
     children: [
       {
@@ -57,5 +60,9 @@ export const router = createBrowserRouter([
   {
     Component: Verify,
     path: "/verify",
+  },
+  {
+    Component: Unauthorized,
+    path: "/unauthorized",
   },
 ]);
