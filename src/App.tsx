@@ -1,9 +1,16 @@
-import { Button } from "./components/ui/button";
+import { Outlet } from "react-router";
+import CommonLayout from "./components/layouts/CommonLayout";
+import ScrollToTop from "./utils/scrollToTop";
+import LoadingLayout from "./components/layouts/LoadingLayout";
 
 function App() {
   return (
     <>
-      <Button>Hello World</Button>
+      <CommonLayout>
+        <ScrollToTop />
+        <Outlet />
+      </CommonLayout>
+      <LoadingLayout />
     </>
   );
 }
