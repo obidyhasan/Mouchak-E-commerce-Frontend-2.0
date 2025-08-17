@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useKeenSlider } from "keen-slider/react";
 import "keen-slider/keen-slider.min.css";
-import galleryImg from "@/assets/images/honey-2.webp";
+import { useGetImagesQuery } from "@/redux/features/gallery/gallery.api";
 
 const animation = { duration: 12000, easing: (t: number) => t };
 
@@ -35,43 +36,21 @@ const GallerySlider = () => {
     },
   });
 
+  const { data, isLoading } = useGetImagesQuery(undefined) || [];
+
+  if (isLoading) return;
+
   return (
     <div ref={sliderRef} className="mt-10 keen-slider ">
-      <div className="keen-slider__slide">
-        <img
-          src={galleryImg}
-          alt="gallery image"
-          className="h-96 object-cover w-full"
-        />
-      </div>
-      <div className="keen-slider__slide">
-        <img
-          src={galleryImg}
-          alt="gallery image"
-          className="h-96 object-cover w-full"
-        />
-      </div>
-      <div className="keen-slider__slide">
-        <img
-          src={galleryImg}
-          alt="gallery image"
-          className="h-96 object-cover w-full"
-        />
-      </div>
-      <div className="keen-slider__slide">
-        <img
-          src={galleryImg}
-          alt="gallery image"
-          className="h-96 object-cover w-full"
-        />
-      </div>
-      <div className="keen-slider__slide">
-        <img
-          src={galleryImg}
-          alt="gallery image"
-          className="h-96 object-cover w-full"
-        />
-      </div>
+      {data?.map((gallery: any) => (
+        <div key={gallery?._id} className="keen-slider__slide">
+          <img
+            src={gallery?.image}
+            alt="gallery image"
+            className="h-96 object-cover w-full"
+          />
+        </div>
+      ))}
     </div>
   );
 };

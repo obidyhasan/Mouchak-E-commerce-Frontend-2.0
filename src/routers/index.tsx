@@ -29,7 +29,7 @@ export const router = createBrowserRouter([
       },
       {
         Component: ProductDetails,
-        path: "/product-details",
+        path: "/product/:slug",
       },
       {
         Component: withAuth(Profile, ...Object.values(Role)),

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import LoadingLayout from "@/components/layouts/LoadingLayout";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -8,16 +8,41 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useGetProductQuery } from "@/redux/features/product/product.api";
+import {
+  productApi,
+  useDeleteProductMutation,
+  useGetProductQuery,
+} from "@/redux/features/product/product.api";
+import { Pencil, Trash2 } from "lucide-react";
+import EditProductDialog from "./EditProductDialog";
+import DeleteAlertDialog from "@/components/DeleteAlertDialog";
+import { toast } from "sonner";
+import type { IErrorResponse } from "@/types";
+import { useDispatch } from "react-redux";
+import { Badge } from "@/components/ui/badge";
 
 const AllProductTable = () => {
   const { data, isLoading } = useGetProductQuery(undefined) || [];
+  const [deleteProduct] = useDeleteProductMutation();
+  const dispatch = useDispatch();
 
   if (isLoading) {
-    <LoadingLayout />;
+    return;
   }
 
-  console.log(data);
+  const handleProductDelete = async (id: string) => {
+    const toastId = toast.loading("Product deleting...");
+    try {
+      await deleteProduct(id).unwrap();
+      dispatch(productApi.util.resetApiState());
+      toast.success("Product deleted successfully", { id: toastId });
+    } catch (err: unknown) {
+      console.error(err);
+      toast.error((err as IErrorResponse).message || "Something went wrong", {
+        id: toastId,
+      });
+    }
+  };
 
   return (
     <div>
@@ -25,9 +50,9 @@ const AllProductTable = () => {
         <TableHeader>
           <TableRow className="hover:bg-transparent">
             <TableHead>Name</TableHead>
-            <TableHead>Category</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead className="text-right">Price</TableHead>
+            <TableHead>Price</TableHead>
+            <TableHead className="text-right">Action</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -37,25 +62,65 @@ const AllProductTable = () => {
                 <div className="flex items-center gap-3">
                   <img
                     className="rounded-sm w-12 h-12 object-cover"
-                    src={product.image}
+                    src={product?.image}
                     width={50}
                     height={50}
-                    alt={product.name}
+                    alt={product?.name}
                   />
                   <div>
-                    <div className="font-medium">{product.name}</div>
+                    <div className="font-medium">{product?.name}</div>
+                    <span className="text-muted-foreground mt-0.5 text-xs">
+                      {product.category}
+                    </span>
                   </div>
                 </div>
               </TableCell>
-              <TableCell>{product.category}</TableCell>
-              <TableCell>{product.status}</TableCell>
+              <TableCell>
+                {product?.status === "ACTIVE" && (
+                  <Badge
+                    variant="default"
+                    className="text-xs rounded-full mx-auto w-max"
+                  >
+                    {product?.status}
+                  </Badge>
+                )}
+                {product?.status === "INACTIVE" && (
+                  <Badge
+                    variant="outline"
+                    className="text-xs rounded-full mx-auto w-max"
+                  >
+                    {product?.status}
+                  </Badge>
+                )}
+                {product?.status === "STOCK_OUT" && (
+                  <Badge
+                    variant="destructive"
+                    className="text-xs rounded-full mx-auto w-max"
+                  >
+                    {product?.status}
+                  </Badge>
+                )}
+              </TableCell>
+              <TableCell>Tk. {product?.price}</TableCell>
 
-              <TableCell className="text-right">Tk. {product.price}</TableCell>
+              <TableCell className="text-right flex justify-end gap-2 flex-wrap">
+                <EditProductDialog slug={product?.slug as string}>
+                  <Button variant={"outline"} size={"icon"}>
+                    <Pencil />
+                  </Button>
+                </EditProductDialog>
+                <DeleteAlertDialog
+                  onConfirm={() => handleProductDelete(product?._id)}
+                >
+                  <Button size="icon">
+                    <Trash2 />
+                  </Button>
+                </DeleteAlertDialog>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
-      <p className="text-muted-foreground mt-4 text-center text-sm">Products</p>
     </div>
   );
 };

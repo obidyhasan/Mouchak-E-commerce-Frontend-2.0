@@ -1,37 +1,62 @@
-import productImg from "@/assets/images/honey-2.webp";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from "@/components/ui/button";
+import { deleteCart, updateQuantity } from "@/redux/features/cart/CartSlice";
+import { useAppDispatch } from "@/redux/hook";
+import { useEffect, useState } from "react";
 import { FiMinus, FiPlus } from "react-icons/fi";
 import { TiDelete } from "react-icons/ti";
 
-const CartItem = () => {
+const CartItem = ({ item }: any) => {
+  const dispatch = useAppDispatch();
+  const [quantity, setQuantity] = useState(item?.quantity);
+
+  const handleCartItemDelete = () => {
+    dispatch(deleteCart(item?.id));
+  };
+
+  useEffect(() => {
+    dispatch(updateQuantity({ id: item?.id, quantity: quantity }));
+  }, [dispatch, item, quantity]);
+
   return (
     <div className=" border-b mx-4 py-2 sm:py-3 flex gap-3 items-center">
       <div className="w-20 h-20">
         <img
-          src={productImg}
+          src={item?.image}
           alt="cart item image"
           className="w-full h-full object-cover rounded-sm"
         />
       </div>
       <div className="grow space-y-0.5">
-        <h1>Product Name</h1>
+        <h1>{item?.name}</h1>
         <div className="flex justify-between items-center w-full">
-          <p className="text-sm">Tk. 400 X 2</p>
-          <p>Tk. 800</p>
+          <p className="text-sm">
+            Tk. {item?.price} X {item?.quantity}
+          </p>
+          <p>Tk. {Number(item?.price) * Number(item?.quantity)}</p>
         </div>
         <div className="flex justify-between items-center w-full">
-          <div className="flex items-center justify-center gap-3">
-            <Button size={"icon"} variant={"outline"}>
+          <div className="flex items-center gap-3">
+            <Button
+              onClick={() => setQuantity(quantity - 1)}
+              size={"icon"}
+              variant={"outline"}
+              disabled={quantity <= 1}
+            >
               <FiMinus />
             </Button>
-            <p>2</p>
-            <Button size={"sm"} variant={"outline"}>
+            <p>{quantity}</p>
+            <Button
+              onClick={() => setQuantity(quantity + 1)}
+              size={"sm"}
+              variant={"outline"}
+            >
               <FiPlus />
             </Button>
           </div>
-          <p>
+          <button onClick={handleCartItemDelete} className="text-primary">
             <TiDelete className="w-6 h-6" />
-          </p>
+          </button>
         </div>
       </div>
     </div>

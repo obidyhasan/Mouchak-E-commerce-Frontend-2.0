@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import CheckoutItemCard from "@/components/modules/Checkout/CheckoutItemCard";
+import { CheckoutOTPDialog } from "@/components/modules/Checkout/CheckoutOTPDialog";
 import SectionHeader from "@/components/modules/Home/SectionHeader";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -22,15 +22,115 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { divisions } from "@/constants/divisions";
+import {
+  useLoginMutation,
+  useUpdateUserMutation,
+  useUserInfoQuery,
+} from "@/redux/features/auth/auth.api";
+import { selectCarts } from "@/redux/features/cart/CartSlice";
+import type { IErrorResponse } from "@/types";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useSelector } from "react-redux";
 import { Link } from "react-router";
+import { toast } from "sonner";
+import z from "zod";
+
+const userSchema = z.object({
+  name: z
+    .string("Name field required")
+    .min(1, { message: "Name must be at least 1 characters" }),
+  email: z.email("Invalid Email"),
+  phone: z
+    .string("Phone number must be string")
+    .regex(/^(?:\+8801\d{9}|01\d{9})$/, {
+      message:
+        "Phone number must be valid for Bangladesh, Format: +8801XXXXXXXXX",
+    }),
+  division: z
+    .string("Division field required")
+    .min(2, { message: "Division field required" }),
+  address: z
+    .string("Address field required")
+    .min(5, { message: "Address must be at least 5 characters" }),
+});
 
 const Checkout = () => {
-  const form = useForm();
+  const { data, isLoading } = useUserInfoQuery(undefined);
+  const userInfo = data?.data;
+  const carts = useSelector(selectCarts);
+  const [login] = useLoginMutation();
+  const [updateUser] = useUpdateUserMutation();
+  const [buttonDisable, setButtonDisable] = useState(false);
+  // dialog
+  const [open, setOpen] = useState(false);
+  const [email] = useState("");
+  const [checkbox, setCheckbox] = useState(false);
 
-  const onSubmit = async (data: any) => {
-    console.log(data);
+  const form = useForm<z.infer<typeof userSchema>>({
+    resolver: zodResolver(userSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      division: "",
+      address: "",
+    },
+  });
+
+  useEffect(() => {
+    if (userInfo) {
+      form.reset({
+        name: userInfo?.name,
+        email: userInfo?.email,
+        phone: userInfo?.phone,
+        division: userInfo?.division,
+        address: userInfo?.address,
+      });
+    }
+  }, [userInfo, form]);
+
+  if (isLoading) return;
+
+  console.log(userInfo);
+
+  const onSubmit = async (data: z.infer<typeof userSchema>) => {
+    if (userInfo?.email) {
+      setButtonDisable(true);
+      const res = await updateUser({
+        userInfo: data,
+        id: userInfo?._id,
+      }).unwrap();
+      if (res.success) {
+        toast.success("Submit successfully");
+        setButtonDisable(false);
+      }
+    } else {
+      const toastId = toast.loading("Sending otp...");
+      setButtonDisable(true);
+      try {
+        const res = await login(data).unwrap();
+        console.log(res);
+        if (res.success) {
+          setButtonDisable(false);
+          toast.success(res.message, { id: toastId });
+        }
+      } catch (err: unknown) {
+        console.error(err);
+        setButtonDisable(false);
+        toast.error((err as IErrorResponse).message || "Something went wrong", {
+          id: toastId,
+        });
+      }
+    }
   };
+
+  // calculate total price
+  const totalPrice = carts.reduce((acc, item) => {
+    return acc + item.price * item.quantity;
+  }, 0);
+  const shippingCost = 120;
 
   return (
     <div className="max-w-7xl mx-auto px-4">
@@ -45,20 +145,6 @@ const Checkout = () => {
 
       <div className="flex gap-5 flex-col md:flex-row my-5">
         <div className="w-full md:w-1/2 h-min">
-          {/* Coupon section */}
-          {/* <div className="border border-dashed p-4 space-y-3">
-            <p className="text-sm">
-              If you have a coupon code, please apply it below.
-            </p>
-            <div className="join w-full">
-              <input
-                className="input join-item w-full"
-                placeholder="Coupon code"
-              />
-              <button className="btn join-item">Apply Coupon</button>
-            </div>
-          </div> */}
-
           {/* Shipping Details */}
           <div className="my-5">
             <h2 className="text-lg font-semibold mb-5">Shipping Details</h2>
@@ -132,12 +218,17 @@ const Checkout = () => {
 
                   <FormField
                     control={form.control}
-                    name="phone"
+                    name="division"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="pb-1">Division</FormLabel>
                         <FormControl className="">
-                          <Select {...field}>
+                          <Select
+                            value={field.value}
+                            onValueChange={field.onChange}
+                            defaultValue={"Khulna"}
+                            {...field.onBlur}
+                          >
                             <FormControl className="w-full">
                               <SelectTrigger>
                                 <SelectValue placeholder="Select your Division" />
@@ -162,7 +253,7 @@ const Checkout = () => {
 
                   <FormField
                     control={form.control}
-                    name="phone"
+                    name="address"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="pb-1">Address</FormLabel>
@@ -177,7 +268,12 @@ const Checkout = () => {
                     )}
                   />
 
-                  <Button type="submit" className="w-full">
+                  <Button
+                    disabled={buttonDisable}
+                    variant={"outline"}
+                    type="submit"
+                    className="w-full"
+                  >
                     Submit
                   </Button>
                 </form>
@@ -186,26 +282,30 @@ const Checkout = () => {
           </div>
         </div>
 
+        <CheckoutOTPDialog open={open} onOpenChange={setOpen} email={email} />
+
         {/* Your Order */}
         <div className="w-full md:w-1/2 border h-min p-4">
           <h2 className="text-lg font-semibold">Your Order</h2>
           <div>
             <div className="flex flex-col gap-3 mt-4">
-              <CheckoutItemCard></CheckoutItemCard>
+              {carts?.map((item) => (
+                <CheckoutItemCard key={item?.id} item={item} />
+              ))}
 
               <div className="flex items-center justify-between gap-5 text-base font-medium">
                 <p>Subtotal</p>
-                <p>৳ subtotal</p>
+                <p>৳ {totalPrice}</p>
               </div>
               <div className="flex items-center justify-between gap-5 text-base font-medium">
                 <p>Delivery Charges</p>
-                <p>৳ shipping cost</p>
+                <p>৳ {shippingCost}</p>
               </div>
 
               <hr className="text-base-300" />
               <div className="flex items-center justify-between gap-5 text-base font-medium">
                 <p>Total</p>
-                <p>৳ subtotal + shippingCost </p>
+                <p>৳ {Number(totalPrice + shippingCost)} </p>
               </div>
             </div>
             <div className="my-4 space-y-2">
@@ -216,12 +316,20 @@ const Checkout = () => {
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <Checkbox />
+              <Checkbox
+                defaultChecked={checkbox}
+                onCheckedChange={() => setCheckbox(!checkbox)}
+              ></Checkbox>
               <span className="font-semibold text-xs">
                 I have read and agree to the website Terms and conditions *
               </span>
             </div>
-            <Button className="w-full my-4">Confirm Order</Button>
+            <Button
+              disabled={!userInfo?.email || !checkbox}
+              className="w-full my-4"
+            >
+              Confirm Order
+            </Button>
             <p className="text-xs">
               <span className="text-gray-500">
                 Your personal data will be used to process your order, support
