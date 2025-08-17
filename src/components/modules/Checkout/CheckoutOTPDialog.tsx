@@ -34,7 +34,8 @@ import z from "zod";
 interface CheckoutOTPDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  email: string; // 👈 new prop
+  email: string;
+  onConfirm: (toastId: any) => void;
 }
 
 const formSchema = z.object({
@@ -47,6 +48,7 @@ export function CheckoutOTPDialog({
   open,
   onOpenChange,
   email,
+  onConfirm,
 }: CheckoutOTPDialogProps) {
   const [verifyOtp] = useVerifyOtpMutation();
   const [buttonDisable, setButtonDisable] = useState(false);
@@ -74,6 +76,8 @@ export function CheckoutOTPDialog({
         toast.success("OTP verified", { id: toastId });
         onOpenChange(false);
         dispatch(authApi.util.resetApiState());
+        const orderId = toast.loading("Your Order is processing...");
+        onConfirm(orderId);
       }
     } catch (err: any) {
       console.error(err);

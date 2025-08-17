@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import CheckoutItemCard from "@/components/modules/Checkout/CheckoutItemCard";
 import { CheckoutOTPDialog } from "@/components/modules/Checkout/CheckoutOTPDialog";
 import SectionHeader from "@/components/modules/Home/SectionHeader";
@@ -27,13 +28,16 @@ import {
   useUpdateUserMutation,
   useUserInfoQuery,
 } from "@/redux/features/auth/auth.api";
-import { selectCarts } from "@/redux/features/cart/CartSlice";
+import { useAddCartMutation } from "@/redux/features/cart/cart.api";
+import { clearCart, selectCarts } from "@/redux/features/cart/CartSlice";
+import { useAddOrderMutation } from "@/redux/features/order/order.api";
+import { useAppDispatch } from "@/redux/hook";
 import type { IErrorResponse } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { toast } from "sonner";
 import z from "zod";
 
@@ -59,14 +63,18 @@ const userSchema = z.object({
 const Checkout = () => {
   const { data, isLoading } = useUserInfoQuery(undefined);
   const userInfo = data?.data;
-  const carts = useSelector(selectCarts);
   const [login] = useLoginMutation();
   const [updateUser] = useUpdateUserMutation();
   const [buttonDisable, setButtonDisable] = useState(false);
   // dialog
   const [open, setOpen] = useState(false);
-  const [email] = useState("");
+  const [email, setEmail] = useState("");
   const [checkbox, setCheckbox] = useState(false);
+  const carts = useSelector(selectCarts);
+  const [addCart] = useAddCartMutation();
+  const [addOrder] = useAddOrderMutation();
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   const form = useForm<z.infer<typeof userSchema>>({
     resolver: zodResolver(userSchema),
@@ -93,35 +101,31 @@ const Checkout = () => {
 
   if (isLoading) return;
 
-  console.log(userInfo);
-
   const onSubmit = async (data: z.infer<typeof userSchema>) => {
+    setButtonDisable(true);
     if (userInfo?.email) {
-      setButtonDisable(true);
-      const res = await updateUser({
+      const toastId = toast.loading("Your Order is processing...");
+      await updateUser({
         userInfo: data,
         id: userInfo?._id,
       }).unwrap();
-      if (res.success) {
-        toast.success("Submit successfully");
-        setButtonDisable(false);
-      }
+
+      handleConfirmOrder(toastId);
     } else {
       const toastId = toast.loading("Sending otp...");
-      setButtonDisable(true);
       try {
         const res = await login(data).unwrap();
-        console.log(res);
         if (res.success) {
-          setButtonDisable(false);
           toast.success(res.message, { id: toastId });
+          setEmail(data.email);
+          setOpen(true);
         }
       } catch (err: unknown) {
         console.error(err);
-        setButtonDisable(false);
         toast.error((err as IErrorResponse).message || "Something went wrong", {
           id: toastId,
         });
+        setButtonDisable(false);
       }
     }
   };
@@ -131,6 +135,32 @@ const Checkout = () => {
     return acc + item.price * item.quantity;
   }, 0);
   const shippingCost = 120;
+
+  const handleConfirmOrder = async (toastId: any) => {
+    try {
+      const cartIds = [];
+
+      for (const item of carts) {
+        const res = await addCart({
+          product: item?.id,
+          quantity: item?.quantity,
+        }).unwrap();
+        cartIds.push(res?.data?._id);
+      }
+
+      const orderResult = await addOrder({ carts: cartIds }).unwrap();
+      if (orderResult.success) {
+        toast.success("You Order is Confirmed", { id: toastId });
+        dispatch(clearCart());
+        navigate("/", { replace: true });
+      }
+    } catch (err: unknown) {
+      console.error(err);
+      toast.error((err as IErrorResponse).message || "Something went wrong");
+    }
+
+    setButtonDisable(false);
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4">
@@ -152,6 +182,7 @@ const Checkout = () => {
             <div>
               <Form {...form}>
                 <form
+                  id="confirm-order-form"
                   onSubmit={form.handleSubmit(onSubmit)}
                   className="space-y-5"
                 >
@@ -267,22 +298,18 @@ const Checkout = () => {
                       </FormItem>
                     )}
                   />
-
-                  <Button
-                    disabled={buttonDisable}
-                    variant={"outline"}
-                    type="submit"
-                    className="w-full"
-                  >
-                    Submit
-                  </Button>
                 </form>
               </Form>
             </div>
           </div>
         </div>
 
-        <CheckoutOTPDialog open={open} onOpenChange={setOpen} email={email} />
+        <CheckoutOTPDialog
+          onConfirm={handleConfirmOrder}
+          open={open}
+          onOpenChange={setOpen}
+          email={email}
+        />
 
         {/* Your Order */}
         <div className="w-full md:w-1/2 border h-min p-4">
@@ -325,7 +352,8 @@ const Checkout = () => {
               </span>
             </div>
             <Button
-              disabled={!userInfo?.email || !checkbox}
+              disabled={!checkbox || buttonDisable}
+              form="confirm-order-form"
               className="w-full my-4"
             >
               Confirm Order
