@@ -45,6 +45,7 @@ import z from "zod";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
 import type { IErrorResponse } from "@/types";
+import { setLoading } from "@/redux/features/loadingSlice";
 
 interface IProps {
   children: ReactNode;
@@ -112,7 +113,11 @@ const EditProductDialog = ({ children, slug }: IProps) => {
     }
   }, [product, form]);
 
-  if (productIsLoading) return;
+  if (productIsLoading) {
+    dispatch(setLoading(true));
+  } else {
+    dispatch(setLoading(false));
+  }
 
   const onSubmit = async (data: any) => {
     setButtonDisable(true);

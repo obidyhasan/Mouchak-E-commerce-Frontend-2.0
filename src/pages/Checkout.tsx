@@ -30,6 +30,7 @@ import {
 } from "@/redux/features/auth/auth.api";
 import { useAddCartMutation } from "@/redux/features/cart/cart.api";
 import { clearCart, selectCarts } from "@/redux/features/cart/CartSlice";
+import { setLoading } from "@/redux/features/loadingSlice";
 import { useAddOrderMutation } from "@/redux/features/order/order.api";
 import { useAppDispatch } from "@/redux/hook";
 import type { IErrorResponse } from "@/types";
@@ -88,6 +89,12 @@ const Checkout = () => {
   });
 
   useEffect(() => {
+    if (carts.length === 0) {
+      navigate("/", { replace: true });
+    }
+  }, [carts, navigate]);
+
+  useEffect(() => {
     if (userInfo) {
       form.reset({
         name: userInfo?.name,
@@ -99,7 +106,11 @@ const Checkout = () => {
     }
   }, [userInfo, form]);
 
-  if (isLoading) return;
+  if (isLoading) {
+    dispatch(setLoading(true));
+  } else {
+    dispatch(setLoading(false));
+  }
 
   const onSubmit = async (data: z.infer<typeof userSchema>) => {
     setButtonDisable(true);

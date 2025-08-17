@@ -20,6 +20,7 @@ import { toast } from "sonner";
 import type { IErrorResponse } from "@/types";
 import { useDispatch } from "react-redux";
 import { Badge } from "@/components/ui/badge";
+import { setLoading } from "@/redux/features/loadingSlice";
 
 const AllProductTable = () => {
   const { data, isLoading } = useGetProductQuery(undefined) || [];
@@ -27,7 +28,9 @@ const AllProductTable = () => {
   const dispatch = useDispatch();
 
   if (isLoading) {
-    return;
+    dispatch(setLoading(true));
+  } else {
+    dispatch(setLoading(false));
   }
 
   const handleProductDelete = async (id: string) => {

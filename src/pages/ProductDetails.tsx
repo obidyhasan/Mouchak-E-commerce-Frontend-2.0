@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import LoadingLayout from "@/components/layouts/LoadingLayout";
 import ProductCard from "@/components/modules/Home/ProductCard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { addCart } from "@/redux/features/cart/CartSlice";
+import { setLoading } from "@/redux/features/loadingSlice";
 import {
   useGetProductQuery,
   useGetSingleProductQuery,
@@ -25,7 +25,11 @@ const ProductDetails = () => {
   const { data: allProducts, isLoading: allProductLoading } =
     useGetProductQuery(undefined) || [];
 
-  if (singleProductLoading || allProductLoading) return <LoadingLayout />;
+  if (singleProductLoading || allProductLoading) {
+    dispatch(setLoading(true));
+  } else {
+    dispatch(setLoading(false));
+  }
 
   const products = allProducts?.filter(
     (product: any) => product.slug !== slug && product?.status === "ACTIVE"

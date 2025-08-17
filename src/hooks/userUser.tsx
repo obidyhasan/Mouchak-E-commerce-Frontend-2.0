@@ -1,11 +1,14 @@
-import LoadingLayout from "@/components/layouts/LoadingLayout";
 import { useUserInfoQuery } from "@/redux/features/auth/auth.api";
+import { setLoading } from "@/redux/features/loadingSlice";
+import { useDispatch } from "react-redux";
 
 const useUser = () => {
   const { data, isLoading } = useUserInfoQuery(undefined);
-
+  const dispatch = useDispatch();
   if (isLoading) {
-    return <LoadingLayout />;
+    dispatch(setLoading(true));
+  } else {
+    dispatch(setLoading(false));
   }
 
   return data?.data;

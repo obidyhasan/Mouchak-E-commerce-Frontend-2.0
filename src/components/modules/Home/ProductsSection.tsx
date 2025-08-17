@@ -1,10 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useGetProductQuery } from "@/redux/features/product/product.api";
 import ProductCard from "./ProductCard";
+import { useDispatch } from "react-redux";
+import { setLoading } from "@/redux/features/loadingSlice";
 
 const ProductsSection = () => {
   const { data, isLoading } = useGetProductQuery(undefined) || [];
-  if (isLoading) return;
+  const dispatch = useDispatch();
+
+  if (isLoading) {
+    dispatch(setLoading(true));
+  } else {
+    dispatch(setLoading(false));
+  }
 
   const products = data?.filter((product: any) => product?.status === "ACTIVE");
 
