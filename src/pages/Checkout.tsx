@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import CheckoutItemCard from "@/components/modules/Checkout/CheckoutItemCard";
 import { CheckoutOTPDialog } from "@/components/modules/Checkout/CheckoutOTPDialog";
+import { OrderConfirmDialog } from "@/components/modules/Checkout/OrderConfirmDialog";
 import SectionHeader from "@/components/modules/Home/SectionHeader";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -29,7 +30,7 @@ import {
   useUserInfoQuery,
 } from "@/redux/features/auth/auth.api";
 import { useAddCartMutation } from "@/redux/features/cart/cart.api";
-import { clearCart, selectCarts } from "@/redux/features/cart/CartSlice";
+import { selectCarts } from "@/redux/features/cart/CartSlice";
 import { setLoading } from "@/redux/features/loadingSlice";
 import { useAddOrderMutation } from "@/redux/features/order/order.api";
 import { useAppDispatch } from "@/redux/hook";
@@ -67,8 +68,13 @@ const Checkout = () => {
   const [login] = useLoginMutation();
   const [updateUser] = useUpdateUserMutation();
   const [buttonDisable, setButtonDisable] = useState(false);
+  const [shippingCost, setShippingCost] = useState(60);
+  const [shippingStyle, setShippingStyle] = useState(
+    "text-primary flex items-center justify-between gap-5 text-base font-medium"
+  );
   // dialog
   const [open, setOpen] = useState(false);
+  const [orderConfirmOpen, setOrderConfirmOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [checkbox, setCheckbox] = useState(false);
   const carts = useSelector(selectCarts);
@@ -110,6 +116,25 @@ const Checkout = () => {
     dispatch(setLoading(isLoading));
   }, [isLoading, dispatch]);
 
+  useEffect(() => {
+    if (carts.length > 1) {
+      setShippingCost(0);
+      setShippingStyle(
+        "text-primary flex items-center justify-between gap-5 text-base font-medium"
+      );
+    } else if (carts.length === 1 && carts[0].quantity > 1) {
+      setShippingCost(0);
+      setShippingStyle(
+        "text-primary flex items-center justify-between gap-5 text-base font-medium"
+      );
+    } else {
+      setShippingCost(60);
+      setShippingStyle(
+        "flex items-center justify-between gap-5 text-base font-medium"
+      );
+    }
+  }, [carts]);
+
   const onSubmit = async (data: z.infer<typeof userSchema>) => {
     setButtonDisable(true);
     if (userInfo?.email) {
@@ -143,7 +168,6 @@ const Checkout = () => {
   const totalPrice = carts.reduce((acc, item) => {
     return acc + item.price * item.quantity;
   }, 0);
-  const shippingCost = 120;
 
   const handleConfirmOrder = async (toastId: any) => {
     try {
@@ -160,8 +184,7 @@ const Checkout = () => {
       const orderResult = await addOrder({ carts: cartIds }).unwrap();
       if (orderResult.success) {
         toast.success("You Order is Confirmed", { id: toastId });
-        dispatch(clearCart());
-        navigate("/", { replace: true });
+        setOrderConfirmOpen(true);
       }
     } catch (err: unknown) {
       console.error(err);
@@ -264,10 +287,10 @@ const Checkout = () => {
                         <FormLabel className="pb-1">Division</FormLabel>
                         <FormControl className="">
                           <Select
-                            value={field.value}
+                            defaultValue={userInfo?.division}
                             onValueChange={field.onChange}
-                            defaultValue={"Khulna"}
                             {...field.onBlur}
+                            {...field.onChange}
                           >
                             <FormControl className="w-full">
                               <SelectTrigger>
@@ -320,6 +343,8 @@ const Checkout = () => {
           email={email}
         />
 
+        <OrderConfirmDialog open={orderConfirmOpen} />
+
         {/* Your Order */}
         <div className="w-full md:w-1/2 border h-min p-4">
           <h2 className="text-lg font-semibold">Your Order</h2>
@@ -333,9 +358,9 @@ const Checkout = () => {
                 <p>Subtotal</p>
                 <p>৳ {totalPrice}</p>
               </div>
-              <div className="flex items-center justify-between gap-5 text-base font-medium">
+              <div className={shippingStyle}>
                 <p>Delivery Charges</p>
-                <p>৳ {shippingCost}</p>
+                <p>{shippingCost === 0 ? "Free" : `৳ ${shippingCost}`}</p>
               </div>
 
               <hr className="text-base-300" />
