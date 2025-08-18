@@ -54,7 +54,8 @@ export const AllOrdersTable = () => {
       toast.error(
         err?.data?.message ||
           (err as IErrorResponse).message ||
-          "Something went wrong"
+          "Something went wrong",
+        { id: toastId }
       );
     }
   };
