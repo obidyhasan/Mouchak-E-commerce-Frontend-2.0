@@ -13,6 +13,8 @@ import { adminSidebarItems } from "./adminSidebarItems";
 import Unauthorized from "@/pages/Unauthorized";
 import { withAuth } from "@/utils/withAuth";
 import { Role } from "@/constants/role";
+import MyOrderCarts from "@/pages/user/MyOrderCarts";
+import OrderDetails from "@/pages/admin/OrderDetails";
 
 export const router = createBrowserRouter([
   {
@@ -39,6 +41,10 @@ export const router = createBrowserRouter([
         Component: withAuth(MyOrders, ...Object.values(Role)),
         path: "/me/orders",
       },
+      {
+        Component: withAuth(MyOrderCarts, ...Object.values(Role)),
+        path: "/me/orders/:id",
+      },
     ],
   },
   {
@@ -49,7 +55,12 @@ export const router = createBrowserRouter([
         index: true,
         element: <Navigate to={"/admin/analytics"}></Navigate>,
       },
+
       ...generateRoutes(adminSidebarItems),
+      {
+        path: "/admin/orders/:id",
+        Component: OrderDetails,
+      },
     ],
   },
   {

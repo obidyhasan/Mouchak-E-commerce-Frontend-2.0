@@ -8,6 +8,7 @@ export const cartApi = baseApi.injectEndpoints({
         method: "POST",
         data: cartInfo,
       }),
+      invalidatesTags: ["CART"],
     }),
 
     getCarts: builder.query({

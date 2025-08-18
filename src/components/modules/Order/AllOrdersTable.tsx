@@ -28,6 +28,7 @@ import { useDispatch } from "react-redux";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import type { IErrorResponse } from "@/types";
+import { Link } from "react-router";
 
 export const AllOrdersTable = () => {
   const { data: orders, isLoading: ordersLoading } =
@@ -166,7 +167,9 @@ export const AllOrdersTable = () => {
 
               <TableCell className="text-right flex justify-end gap-2 flex-wrap">
                 <Button size="icon">
-                  <SquareDashedBottom />
+                  <Link to={`/admin/orders/${order?.orderId}`}>
+                    <SquareDashedBottom />
+                  </Link>
                 </Button>
               </TableCell>
             </TableRow>

@@ -8,6 +8,7 @@ export const orderApi = baseApi.injectEndpoints({
         method: "POST",
         data: orderInfo,
       }),
+      invalidatesTags: ["ORDER"],
     }),
     updateOrder: builder.mutation({
       query: ({ updateInfo, id }) => ({
@@ -15,6 +16,7 @@ export const orderApi = baseApi.injectEndpoints({
         method: "PATCH",
         data: updateInfo,
       }),
+      invalidatesTags: ["ORDER"],
     }),
 
     getOrders: builder.query({
@@ -23,6 +25,7 @@ export const orderApi = baseApi.injectEndpoints({
         method: "GET",
       }),
       providesTags: ["ORDER"],
+      transformResponse: (response) => response?.data?.data,
     }),
 
     getAllOrders: builder.query({

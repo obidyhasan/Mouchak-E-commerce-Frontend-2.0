@@ -1,11 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import UserOrderCard from "@/components/modules/Order/UserOrderCard";
+
+import UserOrderCart from "@/components/modules/Order/UserOrderCart";
 import { setLoading } from "@/redux/features/loadingSlice";
 import { useGetOrdersQuery } from "@/redux/features/order/order.api";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
+import { useParams } from "react-router";
 
-const MyOrders = () => {
+const MyOrderCarts = () => {
+  const { id } = useParams();
   const { data: orders, isLoading } = useGetOrdersQuery(undefined) || [];
   const dispatch = useDispatch();
 
@@ -13,19 +16,17 @@ const MyOrders = () => {
     dispatch(setLoading(isLoading));
   }, [isLoading, dispatch]);
 
-  console.log(orders);
+  const order = orders?.find((order: any) => order?.orderId === id);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-4 md:py-10">
-      <h1 className="font-medium text-lg md:text-xl mb-4">Orders</h1>
+      <h1 className="font-medium text-lg md:text-xl mb-4">Orders Details</h1>
 
       <div className="space-y-4">
-        {orders?.map((order: any, idx: number) => (
-          <UserOrderCard key={idx} order={order} />
-        ))}
+        <UserOrderCart order={order} />
       </div>
     </div>
   );
 };
 
-export default MyOrders;
+export default MyOrderCarts;
