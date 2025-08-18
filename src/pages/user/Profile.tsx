@@ -29,13 +29,92 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { divisions } from "@/constants/divisions";
+import {
+  useUpdateUserMutation,
+  useUserInfoQuery,
+} from "@/redux/features/auth/auth.api";
+import { setLoading } from "@/redux/features/loadingSlice";
+import type { IErrorResponse } from "@/types";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
+import { toast } from "sonner";
+import z from "zod";
+
+const userSchema = z.object({
+  name: z
+    .string("Name field required")
+    .min(1, { message: "Name must be at least 1 characters" }),
+  phone: z
+    .string("Phone number must be string")
+    .regex(/^(?:\+8801\d{9}|01\d{9})$/, {
+      message:
+        "Phone number must be valid for Bangladesh, Format: +8801XXXXXXXXX",
+    }),
+  division: z
+    .string("Division field required")
+    .min(2, { message: "Division field required" }),
+  address: z
+    .string("Address field required")
+    .min(5, { message: "Address must be at least 5 characters" }),
+});
 
 const Profile = () => {
-  const form = useForm();
+  const { data, isLoading } = useUserInfoQuery(undefined);
+  const user = data?.data;
+  const dispatch = useDispatch();
+  const [updateUser] = useUpdateUserMutation();
+  const [open, setOpen] = useState(false);
+  const [buttonDisable, setButtonDisable] = useState(false);
+
+  useEffect(() => {
+    dispatch(setLoading(isLoading));
+  }, [isLoading, dispatch]);
+
+  const form = useForm<z.infer<typeof userSchema>>({
+    resolver: zodResolver(userSchema),
+    defaultValues: {
+      name: "",
+      phone: "",
+      division: "",
+      address: "",
+    },
+  });
+
+  useEffect(() => {
+    if (user) {
+      form.reset({
+        name: user?.name,
+        phone: user?.phone,
+        division: user?.division,
+        address: user?.address,
+      });
+    }
+  }, [user, form]);
 
   const onSubmit = async (data: any) => {
-    console.log(data);
+    const toastId = toast.loading("Updating user info...");
+    setButtonDisable(true);
+    try {
+      const res = await updateUser({
+        userInfo: data,
+        id: user?._id,
+      }).unwrap();
+      if (res.success) {
+        toast.success("User info updated successfully", { id: toastId });
+        setOpen(false);
+      }
+    } catch (err: any) {
+      console.error(err);
+      toast.error(
+        err?.data?.message ||
+          (err as IErrorResponse).message ||
+          "Something went wrong"
+      );
+    } finally {
+      setButtonDisable(false);
+    }
   };
 
   return (
@@ -47,28 +126,28 @@ const Profile = () => {
           <div className="border p-4 rounded-md mt-6 space-y-3">
             <div className="border-b pb-2">
               <p className="text-sm mb-1 text-muted-foreground">Name</p>
-              <h2>Obidy Hasan Naim</h2>
+              <h2>{user?.name}</h2>
             </div>
             <div className="border-b pb-2">
               <p className="text-sm mb-1 text-muted-foreground">Email</p>
-              <h2>obidyhasan@gmail.com</h2>
+              <h2>{user?.email}</h2>
             </div>
             <div className="border-b pb-2">
               <p className="text-sm mb-1 text-muted-foreground">Phone Number</p>
-              <h2>01925658596</h2>
+              <h2>{user?.phone}</h2>
             </div>
             <div className="border-b pb-2">
               <p className="text-sm mb-1 text-muted-foreground">Division</p>
-              <h2>Khulna</h2>
+              <h2>{user?.division}</h2>
             </div>
             <div className="">
               <p className="text-sm mb-1 text-muted-foreground">Address</p>
-              <h2>Rampal, Foyla, Bagerhat</h2>
+              <h2>{user?.address}</h2>
             </div>
           </div>
 
           {/* Dialog */}
-          <Dialog>
+          <Dialog open={open} onOpenChange={setOpen}>
             <form>
               <DialogTrigger asChild>
                 <Button className="mt-5">Edit Profile</Button>
@@ -84,6 +163,7 @@ const Profile = () => {
                 <div className="grid gap-4">
                   <Form {...form}>
                     <form
+                      id="user-edit-form"
                       onSubmit={form.handleSubmit(onSubmit)}
                       className="space-y-5"
                     >
@@ -131,12 +211,17 @@ const Profile = () => {
 
                       <FormField
                         control={form.control}
-                        name="phone"
+                        name="division"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel className="pb-1">Division</FormLabel>
                             <FormControl className="">
-                              <Select {...field}>
+                              <Select
+                                defaultValue={user?.division}
+                                onValueChange={field.onChange}
+                                {...field.onBlur}
+                                {...field.onChange}
+                              >
                                 <FormControl className="w-full">
                                   <SelectTrigger>
                                     <SelectValue placeholder="Select your Division" />
@@ -161,7 +246,7 @@ const Profile = () => {
 
                       <FormField
                         control={form.control}
-                        name="phone"
+                        name="address"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel className="pb-1">Address</FormLabel>
@@ -185,7 +270,13 @@ const Profile = () => {
                   <DialogClose asChild>
                     <Button variant="outline">Cancel</Button>
                   </DialogClose>
-                  <Button type="submit">Save changes</Button>
+                  <Button
+                    disabled={buttonDisable}
+                    form="user-edit-form"
+                    type="submit"
+                  >
+                    Save changes
+                  </Button>
                 </DialogFooter>
               </DialogContent>
             </form>

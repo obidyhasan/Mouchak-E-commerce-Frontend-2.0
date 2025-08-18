@@ -21,17 +21,16 @@ import type { IErrorResponse } from "@/types";
 import { useDispatch } from "react-redux";
 import { Badge } from "@/components/ui/badge";
 import { setLoading } from "@/redux/features/loadingSlice";
+import { useEffect } from "react";
 
 const AllProductTable = () => {
   const { data, isLoading } = useGetProductQuery(undefined) || [];
   const [deleteProduct] = useDeleteProductMutation();
   const dispatch = useDispatch();
 
-  if (isLoading) {
-    dispatch(setLoading(true));
-  } else {
-    dispatch(setLoading(false));
-  }
+  useEffect(() => {
+    dispatch(setLoading(isLoading));
+  }, [isLoading, dispatch]);
 
   const handleProductDelete = async (id: string) => {
     const toastId = toast.loading("Product deleting...");

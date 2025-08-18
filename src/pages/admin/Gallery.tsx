@@ -4,16 +4,15 @@ import ImageCard from "@/components/modules/gallery/ImageCard";
 import { Button } from "@/components/ui/button";
 import { useGetImagesQuery } from "@/redux/features/gallery/gallery.api";
 import { setLoading } from "@/redux/features/loadingSlice";
+import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 
 const Gallery = () => {
   const { data, isLoading } = useGetImagesQuery(undefined) || [];
   const dispatch = useDispatch();
-  if (isLoading) {
-    dispatch(setLoading(true));
-  } else {
-    dispatch(setLoading(false));
-  }
+  useEffect(() => {
+    dispatch(setLoading(isLoading));
+  }, [isLoading, dispatch]);
 
   return (
     <div>
