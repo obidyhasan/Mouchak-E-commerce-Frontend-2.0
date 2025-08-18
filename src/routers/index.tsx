@@ -15,6 +15,7 @@ import { withAuth } from "@/utils/withAuth";
 import { Role } from "@/constants/role";
 import MyOrderCarts from "@/pages/user/MyOrderCarts";
 import OrderDetails from "@/pages/admin/OrderDetails";
+import UpdateProduct from "@/pages/admin/UpdateProduct";
 
 export const router = createBrowserRouter([
   {
@@ -53,13 +54,17 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Navigate to={"/admin/analytics"}></Navigate>,
+        element: <Navigate to={"/admin/products"}></Navigate>,
       },
 
       ...generateRoutes(adminSidebarItems),
       {
         path: "/admin/orders/:id",
         Component: OrderDetails,
+      },
+      {
+        path: "/admin/products/:slug",
+        Component: UpdateProduct,
       },
     ],
   },

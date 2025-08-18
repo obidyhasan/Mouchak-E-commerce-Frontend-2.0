@@ -1,4 +1,3 @@
-import Analytics from "@/pages/admin/Analytics";
 import Gallery from "@/pages/admin/Gallery";
 import Orders from "@/pages/admin/Orders";
 import Products from "@/pages/admin/Products";
@@ -8,11 +7,6 @@ export const adminSidebarItems: ISidebarItem[] = [
   {
     title: "Dashboard",
     items: [
-      {
-        title: "Analytics",
-        url: "/admin/analytics",
-        component: Analytics,
-      },
       {
         title: "Products",
         url: "/admin/products",

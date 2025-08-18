@@ -14,7 +14,6 @@ import {
   useGetProductQuery,
 } from "@/redux/features/product/product.api";
 import { Pencil, Trash2 } from "lucide-react";
-import EditProductDialog from "./EditProductDialog";
 import DeleteAlertDialog from "@/components/DeleteAlertDialog";
 import { toast } from "sonner";
 import type { IErrorResponse } from "@/types";
@@ -22,6 +21,7 @@ import { useDispatch } from "react-redux";
 import { Badge } from "@/components/ui/badge";
 import { setLoading } from "@/redux/features/loadingSlice";
 import { useEffect } from "react";
+import { Link } from "react-router";
 
 const AllProductTable = () => {
   const { data, isLoading } = useGetProductQuery(undefined) || [];
@@ -106,11 +106,11 @@ const AllProductTable = () => {
               <TableCell>Tk. {product?.price}</TableCell>
 
               <TableCell className="text-right flex justify-end gap-2 flex-wrap">
-                <EditProductDialog slug={product?.slug as string}>
-                  <Button variant={"outline"} size={"icon"}>
+                <Button variant={"outline"} size={"icon"}>
+                  <Link to={`/admin/products/${product?.slug}`}>
                     <Pencil />
-                  </Button>
-                </EditProductDialog>
+                  </Link>
+                </Button>
                 <DeleteAlertDialog
                   onConfirm={() => handleProductDelete(product?._id)}
                 >
