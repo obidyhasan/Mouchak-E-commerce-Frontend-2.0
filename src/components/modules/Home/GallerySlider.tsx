@@ -4,6 +4,7 @@ import "keen-slider/keen-slider.min.css";
 import { useGetImagesQuery } from "@/redux/features/gallery/gallery.api";
 import { useDispatch } from "react-redux";
 import { setLoading } from "@/redux/features/loadingSlice";
+import { useEffect } from "react";
 
 const animation = { duration: 12000, easing: (t: number) => t };
 
@@ -41,11 +42,9 @@ const GallerySlider = () => {
   const { data, isLoading } = useGetImagesQuery(undefined) || [];
 
   const dispatch = useDispatch();
-  if (isLoading) {
-    dispatch(setLoading(true));
-  } else {
-    dispatch(setLoading(false));
-  }
+  useEffect(() => {
+    dispatch(setLoading(isLoading));
+  }, [isLoading, dispatch]);
 
   return (
     <div ref={sliderRef} className="mt-10 keen-slider ">

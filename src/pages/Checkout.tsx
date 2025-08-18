@@ -106,11 +106,9 @@ const Checkout = () => {
     }
   }, [userInfo, form]);
 
-  if (isLoading) {
-    dispatch(setLoading(true));
-  } else {
-    dispatch(setLoading(false));
-  }
+  useEffect(() => {
+    dispatch(setLoading(isLoading));
+  }, [isLoading, dispatch]);
 
   const onSubmit = async (data: z.infer<typeof userSchema>) => {
     setButtonDisable(true);

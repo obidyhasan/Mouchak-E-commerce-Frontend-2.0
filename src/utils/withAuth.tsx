@@ -1,6 +1,6 @@
 import { useUserInfoQuery } from "@/redux/features/auth/auth.api";
 import { setLoading } from "@/redux/features/loadingSlice";
-import type { ComponentType } from "react";
+import { useEffect, type ComponentType } from "react";
 import { useDispatch } from "react-redux";
 import { Navigate } from "react-router";
 
@@ -11,18 +11,17 @@ export const withAuth = (
   return function AuthRapper() {
     const { data, isLoading } = useUserInfoQuery(undefined);
     const dispatch = useDispatch();
-    if (isLoading) {
-      dispatch(setLoading(true));
-    } else {
-      dispatch(setLoading(false));
-    }
+
+    useEffect(() => {
+      dispatch(setLoading(isLoading));
+    }, [isLoading, dispatch]);
 
     if (!isLoading && !data?.data?.email) {
       return <Navigate to={"/login"} />;
     }
 
     if (
-      requiredRole &&
+      requiredRole.length > 0 &&
       !isLoading &&
       !requiredRole.includes(data?.data?.role)
     ) {

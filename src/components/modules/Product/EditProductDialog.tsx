@@ -113,11 +113,9 @@ const EditProductDialog = ({ children, slug }: IProps) => {
     }
   }, [product, form]);
 
-  if (productIsLoading) {
-    dispatch(setLoading(true));
-  } else {
-    dispatch(setLoading(false));
-  }
+  useEffect(() => {
+    dispatch(setLoading(productIsLoading));
+  }, [productIsLoading, dispatch]);
 
   const onSubmit = async (data: any) => {
     setButtonDisable(true);

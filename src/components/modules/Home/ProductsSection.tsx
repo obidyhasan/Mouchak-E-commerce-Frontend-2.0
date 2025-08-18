@@ -3,16 +3,15 @@ import { useGetProductQuery } from "@/redux/features/product/product.api";
 import ProductCard from "./ProductCard";
 import { useDispatch } from "react-redux";
 import { setLoading } from "@/redux/features/loadingSlice";
+import { useEffect } from "react";
 
 const ProductsSection = () => {
   const { data, isLoading } = useGetProductQuery(undefined) || [];
   const dispatch = useDispatch();
 
-  if (isLoading) {
-    dispatch(setLoading(true));
-  } else {
-    dispatch(setLoading(false));
-  }
+  useEffect(() => {
+    dispatch(setLoading(isLoading));
+  }, [isLoading, dispatch]);
 
   const products = data?.filter((product: any) => product?.status === "ACTIVE");
 

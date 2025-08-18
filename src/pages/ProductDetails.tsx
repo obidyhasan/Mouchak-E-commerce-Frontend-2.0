@@ -9,7 +9,7 @@ import {
   useGetSingleProductQuery,
 } from "@/redux/features/product/product.api";
 import { useAppDispatch } from "@/redux/hook";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FiMinus, FiPlus, FiShoppingCart } from "react-icons/fi";
 import { useParams } from "react-router";
 import { toast } from "sonner";
@@ -25,11 +25,13 @@ const ProductDetails = () => {
   const { data: allProducts, isLoading: allProductLoading } =
     useGetProductQuery(undefined) || [];
 
-  if (singleProductLoading || allProductLoading) {
-    dispatch(setLoading(true));
-  } else {
-    dispatch(setLoading(false));
-  }
+  useEffect(() => {
+    dispatch(setLoading(singleProductLoading));
+  }, [singleProductLoading, dispatch]);
+
+  useEffect(() => {
+    dispatch(setLoading(allProductLoading));
+  }, [allProductLoading, dispatch]);
 
   const products = allProducts?.filter(
     (product: any) => product.slug !== slug && product?.status === "ACTIVE"
@@ -54,8 +56,8 @@ const ProductDetails = () => {
         <section className="w-full md:w-1/2">
           <figure>
             <img
-              src={product.image}
-              alt={product.name}
+              src={product?.image}
+              alt={product?.name}
               className="w-full object-cover rounded-lg "
             />
           </figure>
