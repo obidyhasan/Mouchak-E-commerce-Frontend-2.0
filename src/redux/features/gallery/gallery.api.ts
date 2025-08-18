@@ -8,6 +8,7 @@ export const galleryApi = baseApi.injectEndpoints({
         method: "POST",
         data: image,
       }),
+      invalidatesTags: ["GALLERY"],
     }),
 
     deleteImage: builder.mutation({
@@ -15,6 +16,7 @@ export const galleryApi = baseApi.injectEndpoints({
         url: `/gallery/${id}`,
         method: "DELETE",
       }),
+      invalidatesTags: ["GALLERY"],
     }),
 
     getImages: builder.query({
