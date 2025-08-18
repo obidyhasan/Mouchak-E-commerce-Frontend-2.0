@@ -1,4 +1,5 @@
-import { HouseIcon, InboxIcon, ZapIcon } from "lucide-react";
+import { useState } from "react";
+import { HouseIcon } from "lucide-react";
 
 import Logo from "@/assets/icons/Logo";
 import UserMenu from "@/components/ui/user-menu";
@@ -22,13 +23,13 @@ import { LuUserRound } from "react-icons/lu";
 // Navigation links array
 const navigationLinks = [
   { href: "/", label: "Home", icon: HouseIcon, active: true },
-  { href: "/about", label: "About", icon: InboxIcon },
-  { href: "/support", label: "Support", icon: ZapIcon },
+  // { href: "/about", label: "About", icon: InboxIcon },
 ];
 
 export default function Navbar() {
   const userInfo = useUser();
   const navigate = useNavigate();
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   const goToLoginPage = () => {
     navigate("/login");
@@ -40,7 +41,7 @@ export default function Navbar() {
         {/* Left side */}
         <div className="flex flex-1 items-center gap-2">
           {/* Mobile menu trigger */}
-          <Popover>
+          <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
             <PopoverTrigger asChild>
               <Button
                 className="group size-8 md:hidden"
@@ -88,7 +89,8 @@ export default function Navbar() {
                         >
                           <Link
                             to={link.href}
-                            className="flex items-center gap-2"
+                            className="flex items-center gap-2 w-full"
+                            onClick={() => setIsPopoverOpen(false)}
                           >
                             <Icon
                               size={16}
@@ -106,6 +108,7 @@ export default function Navbar() {
             </PopoverContent>
           </Popover>
 
+          {/* Desktop menu */}
           <NavigationMenu className="max-md:hidden">
             <NavigationMenuList className="gap-2">
               {navigationLinks.map((link, index) => {
@@ -141,20 +144,17 @@ export default function Navbar() {
         </div>
 
         {/* Right side: Actions */}
-        <div className="flex flex-1 items-center justify-end">
+        <div className="flex flex-1 items-center justify-end gap-2">
           {userInfo ? (
             <UserMenu />
           ) : (
-            <>
-              <div
-                onClick={goToLoginPage}
-                className="p-2 hover:text-primary cursor-pointer transition-colors duration-200 h-auto rounded-full hover:bg-transparent"
-              >
-                <LuUserRound className="w-5 h-5" />
-              </div>
-            </>
+            <div
+              onClick={goToLoginPage}
+              className="p-2 hover:text-primary cursor-pointer transition-colors duration-200 h-auto rounded-full hover:bg-transparent"
+            >
+              <LuUserRound className="w-5 h-5" />
+            </div>
           )}
-          {/* Cart */}
           <CartSidebar />
         </div>
       </div>

@@ -16,6 +16,7 @@ import { Role } from "@/constants/role";
 import MyOrderCarts from "@/pages/user/MyOrderCarts";
 import OrderDetails from "@/pages/admin/OrderDetails";
 import UpdateProduct from "@/pages/admin/UpdateProduct";
+import About from "@/pages/About";
 
 export const router = createBrowserRouter([
   {
@@ -25,6 +26,10 @@ export const router = createBrowserRouter([
       {
         Component: Home,
         path: "/",
+      },
+      {
+        Component: About,
+        path: "/about",
       },
       {
         Component: Checkout,

@@ -19,8 +19,8 @@ const CartItem = ({ item }: any) => {
   }, [dispatch, item, quantity]);
 
   return (
-    <div className=" border-b mx-4 py-2 sm:py-3 flex gap-3 items-center">
-      <div className="w-20 h-20">
+    <div className=" border-b mx-2 sm:mx-4 py-2 sm:py-3 flex gap-3 items-center">
+      <div className="w-16 h-16 sm:w-20 sm:h-20">
         <img
           src={item?.image}
           alt="cart item image"
@@ -28,12 +28,14 @@ const CartItem = ({ item }: any) => {
         />
       </div>
       <div className="grow space-y-0.5">
-        <h1>{item?.name}</h1>
+        <h1 className="text-sm sm:text-base">{item?.name}</h1>
         <div className="flex justify-between items-center w-full">
-          <p className="text-sm">
+          <p className="text-xs sm:text-sm">
             Tk. {item?.price} X {item?.quantity}
           </p>
-          <p>Tk. {Number(item?.price) * Number(item?.quantity)}</p>
+          <p className="text-xs sm:text-sm">
+            Tk. {Number(item?.price) * Number(item?.quantity)}
+          </p>
         </div>
         <div className="flex justify-between items-center w-full">
           <div className="flex items-center gap-3">
@@ -48,7 +50,7 @@ const CartItem = ({ item }: any) => {
             <p>{quantity}</p>
             <Button
               onClick={() => setQuantity(quantity + 1)}
-              size={"sm"}
+              size={"icon"}
               variant={"outline"}
             >
               <FiPlus />

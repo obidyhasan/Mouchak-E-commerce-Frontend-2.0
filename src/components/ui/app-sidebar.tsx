@@ -16,7 +16,6 @@ import { Link } from "react-router";
 import Logo from "@/assets/icons/Logo";
 import { getSidebarItems } from "@/utils/getSidebarItems";
 
-// This is sample data.
 const data = {
   navMain: getSidebarItems("ADMIN") || [],
 };

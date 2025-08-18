@@ -74,7 +74,19 @@ const OrderDetails = () => {
         </div>
         <div>
           <div className="flex justify-between items-center font-semibold mt-2">
-            <span>Total</span> <span>Tk. {totalPrice}</span>
+            <span>Subtotal</span> <span>Tk. {totalPrice}</span>
+          </div>
+          <div className="flex justify-between items-center font-semibold mt-2">
+            <span>Shipping Cost</span>{" "}
+            <span>
+              {order?.shippingCost === 0
+                ? "Free"
+                : `Tk. ${order?.shippingCost}`}
+            </span>
+          </div>
+          <div className="flex justify-between border-t pt-2 items-center font-semibold mt-2">
+            <span>Total</span>{" "}
+            <span>Tk. {Number(totalPrice) + Number(order?.shippingCost)}</span>
           </div>
         </div>
       </div>

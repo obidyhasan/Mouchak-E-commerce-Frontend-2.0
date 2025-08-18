@@ -24,18 +24,24 @@ const Home = () => {
       </section>
       {/* FAQ Section */}
       <section>
-        <SectionHeader
-          title="Frequently Asked Questions"
-          subTitle="Find quick answers to the most common questions about our honey, sourcing, and delivery."
-        />
+        <div className="max-w-7xl mx-auto px-4 w-full">
+          <SectionHeader
+            title="Frequently Asked Questions"
+            subTitle="Find quick answers to the most common questions about our honey, sourcing, and delivery."
+          />
+        </div>
         <FAQAccordion />
       </section>
       {/* Gallery Section */}
       <section>
-        <SectionHeader
-          title="From Hive to Home"
-          subTitle="Take a peek into our honey-making journey, from buzzing hives to the jars on your table."
-        />
+        <div className="max-w-7xl mx-auto px-4 w-full">
+          {" "}
+          <SectionHeader
+            title="From Hive to Home"
+            subTitle="Take a peek into our honey-making journey, from buzzing hives to the jars on your table."
+          />
+        </div>
+
         <GallerySlider />
       </section>
     </div>

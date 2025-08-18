@@ -14,10 +14,11 @@ import CartItem from "./CartItem";
 import { useNavigate } from "react-router";
 import { useSelector } from "react-redux";
 import { selectCarts } from "@/redux/features/cart/CartSlice";
+import { useState } from "react";
 
 export function CartSidebar() {
   const navigate = useNavigate();
-
+  const [openSheet, setOpenSheet] = useState(false);
   const carts = useSelector(selectCarts);
 
   // calculate total price
@@ -26,11 +27,12 @@ export function CartSidebar() {
   }, 0);
 
   const handleCheckoutButton = () => {
+    setOpenSheet(false);
     navigate("/checkout");
   };
 
   return (
-    <Sheet>
+    <Sheet open={openSheet} onOpenChange={setOpenSheet}>
       {/* Cart icon in navbar triggers the Sheet */}
 
       <SheetTrigger asChild>

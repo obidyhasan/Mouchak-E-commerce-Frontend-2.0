@@ -29,12 +29,12 @@ const ProductCard = ({ product }: any) => {
           <img
             src={product?.image}
             alt={product?.name}
-            className="h-64 w-full object-cover transition duration-500 group-hover:scale-105 sm:h-72"
+            className="h-40 w-full object-cover transition duration-500 group-hover:scale-105 sm:h-72"
           />
         </Link>
 
-        <div className="relative border border-gray-100 bg-background p-3">
-          <Link to="/product-details">
+        <div className="relative border border-gray-100 bg-background p-3 flex flex-col ">
+          <Link to="/product-details" className="flex-1">
             <div className="text-center">
               <Badge
                 variant="outline"
@@ -48,7 +48,7 @@ const ProductCard = ({ product }: any) => {
               {product?.name}
             </h3>
 
-            <p className="mt-1.5 text-base text-gray-700 text-center">
+            <p className="mt-1.5 text-sm sm:text-base text-gray-700 text-center">
               Tk. {product?.price}
             </p>
           </Link>

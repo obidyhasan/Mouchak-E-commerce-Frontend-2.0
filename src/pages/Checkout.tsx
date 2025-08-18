@@ -181,14 +181,19 @@ const Checkout = () => {
         cartIds.push(res?.data?._id);
       }
 
-      const orderResult = await addOrder({ carts: cartIds }).unwrap();
+      const orderResult = await addOrder({
+        carts: cartIds,
+        shippingCost: shippingCost,
+      }).unwrap();
       if (orderResult.success) {
         toast.success("You Order is Confirmed", { id: toastId });
         setOrderConfirmOpen(true);
       }
     } catch (err: unknown) {
       console.error(err);
-      toast.error((err as IErrorResponse).message || "Something went wrong");
+      toast.error((err as IErrorResponse).message || "Something went wrong", {
+        id: toastId,
+      });
     }
 
     setButtonDisable(false);

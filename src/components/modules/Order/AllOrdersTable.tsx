@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from "@/components/ui/button";
 import {
@@ -29,12 +29,18 @@ import { format } from "date-fns";
 import { toast } from "sonner";
 import type { IErrorResponse } from "@/types";
 import { Link } from "react-router";
+import UpdateAlertDialog from "./UpdateAlertDialog";
 
 export const AllOrdersTable = () => {
   const { data: orders, isLoading: ordersLoading } =
     useGetAllOrdersQuery(undefined);
   const dispatch = useDispatch();
   const [updateOrder] = useUpdateOrderMutation();
+
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedValue, setSelectedValue] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [updateType, setUpdateType] = useState<"status" | "payment">("status");
 
   useEffect(() => {
     dispatch(setLoading(ordersLoading));
@@ -69,14 +75,15 @@ export const AllOrdersTable = () => {
         id,
       }).unwrap();
       if (res.success) {
-        toast.success("Payment Status updated successfully", { id: toastId });
+        toast.success("Payment status updated successfully", { id: toastId });
       }
     } catch (err: any) {
       console.error(err);
       toast.error(
         err?.data?.message ||
           (err as IErrorResponse).message ||
-          "Something went wrong"
+          "Something went wrong",
+        { id: toastId }
       );
     }
   };
@@ -118,10 +125,17 @@ export const AllOrdersTable = () => {
                   {order?.orderId}
                 </span>
               </TableCell>
+
+              {/* Order Status */}
               <TableCell>
                 <Select
                   defaultValue={order?.status}
-                  onValueChange={(e) => handleStatusUpdate(e, order?._id)}
+                  onValueChange={(value) => {
+                    setSelectedValue(value);
+                    setSelectedId(order?._id || null);
+                    setUpdateType("status");
+                    setOpenDialog(true);
+                  }}
                 >
                   <SelectTrigger className="w-32">
                     <SelectValue placeholder="status" />
@@ -139,12 +153,17 @@ export const AllOrdersTable = () => {
                   </SelectContent>
                 </Select>
               </TableCell>
+
+              {/* Payment Status */}
               <TableCell>
                 <Select
                   defaultValue={order?.paymentStatus}
-                  onValueChange={(e) =>
-                    handlePaymentStatusUpdate(e, order?._id)
-                  }
+                  onValueChange={(value) => {
+                    setSelectedValue(value);
+                    setSelectedId(order?._id || null);
+                    setUpdateType("payment");
+                    setOpenDialog(true);
+                  }}
                 >
                   <SelectTrigger className="w-32">
                     <SelectValue placeholder="payment" />
@@ -154,14 +173,15 @@ export const AllOrdersTable = () => {
                       <SelectLabel>Payment</SelectLabel>
                       <SelectItem value="PAID">PAID</SelectItem>
                       <SelectItem value="UNPAID">UNPAID</SelectItem>
-                      <SelectItem value="REFUND">REFUND</SelectItem>
+                      <SelectItem value="REFUNDED">REFUNDED</SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>
               </TableCell>
+
               <TableCell>
                 <span className="text-base font-medium">
-                  Tk. {order?.totalAmount}
+                  Tk. {Number(order?.totalAmount) + Number(order?.shippingCost)}
                 </span>
               </TableCell>
 
@@ -176,11 +196,23 @@ export const AllOrdersTable = () => {
           ))}
         </TableBody>
       </Table>
-      {/* <UpdateAlertDialog
-        onConfirm={handleConfirmOrderUpdate}
-        open={open}
-        onOpenChange={setOpen}
-      /> */}
+
+      <UpdateAlertDialog
+        openDialog={openDialog}
+        setOpenDialog={setOpenDialog}
+        selectedValue={selectedValue}
+        selectedId={selectedId}
+        onConfirm={
+          updateType === "status"
+            ? handleStatusUpdate
+            : handlePaymentStatusUpdate
+        }
+        title={
+          updateType === "status"
+            ? "Confirm Status Update"
+            : "Confirm Payment Status Update"
+        }
+      />
     </div>
   );
 };

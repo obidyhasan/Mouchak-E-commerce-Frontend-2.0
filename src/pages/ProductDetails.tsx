@@ -62,7 +62,7 @@ const ProductDetails = () => {
             />
           </figure>
         </section>
-        <section className="w-full sm:w-1/2 space-y-3">
+        <section className="w-full sm:w-1/2 space-y-2 sm:space-y-3">
           <div>
             <Badge
               variant="outline"
@@ -72,11 +72,11 @@ const ProductDetails = () => {
             </Badge>
           </div>
 
-          <h3 className="mt-2 text-xl font-semibold text-gray-900 ">
+          <h3 className="mt-2 text-lg sm:text-xl font-semibold text-gray-900 ">
             {product?.name}
           </h3>
 
-          <p className="mt-1.5 text-lg font-semibold text-gray-700 ">
+          <p className="mt-1.5 text-base sm:text-lg font-semibold text-gray-700 ">
             Tk. {product?.price}
           </p>
 
