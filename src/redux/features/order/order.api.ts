@@ -29,12 +29,13 @@ export const orderApi = baseApi.injectEndpoints({
     }),
 
     getAllOrders: builder.query({
-      query: () => ({
+      query: (params) => ({
         url: "/order",
         method: "GET",
+        params,
       }),
       providesTags: ["ORDER"],
-      transformResponse: (response) => response.data.data,
+      transformResponse: (response) => response.data,
     }),
   }),
 });

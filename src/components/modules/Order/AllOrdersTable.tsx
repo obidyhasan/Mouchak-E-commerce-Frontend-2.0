@@ -18,22 +18,48 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { setLoading } from "@/redux/features/loadingSlice";
 import {
   useGetAllOrdersQuery,
   useUpdateOrderMutation,
 } from "@/redux/features/order/order.api";
-import { SquareDashedBottom } from "lucide-react";
+import { SearchIcon, SquareDashedBottom } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import type { IErrorResponse } from "@/types";
-import { Link } from "react-router";
+import { Link, useSearchParams } from "react-router";
 import UpdateAlertDialog from "./UpdateAlertDialog";
+import OrderFilters from "./OrderFilters";
+import { Input } from "@/components/ui/input";
 
 export const AllOrdersTable = () => {
-  const { data: orders, isLoading: ordersLoading } =
-    useGetAllOrdersQuery(undefined);
+  // Filter
+  const [searchParams] = useSearchParams();
+  const status = searchParams.get("status") || undefined;
+
+  // search
+  const [searchTitle, setSearchTitle] = useState("");
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [limit] = useState(8);
+
+  const { data, isLoading: ordersLoading } = useGetAllOrdersQuery({
+    searchTerm: searchTitle,
+    status: status,
+    page: currentPage,
+    limit,
+  });
+  const orders = data?.data || [];
   const dispatch = useDispatch();
   const [updateOrder] = useUpdateOrderMutation();
 
@@ -88,8 +114,31 @@ export const AllOrdersTable = () => {
     }
   };
 
+  console.log(data);
+
+  const totalPage = data?.meta?.totalPage || 1;
+
   return (
     <div>
+      <div className="flex items-center justify-between gap-2 my-2 pb-5">
+        <h1 className="text-xl font-semibold">Orders</h1>
+        <div className="flex gap-2 items-center flex-wrap w-full justify-end">
+          <div className="*:not-first:mt-2 max-w-sm w-full">
+            <div className="relative w-full">
+              <Input
+                onChange={(e) => setSearchTitle(e.target.value)}
+                className="peer ps-9  max-w-2xl"
+                placeholder="Search by order Id, status, payment Status"
+                type="search"
+              />
+              <div className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
+                <SearchIcon size={16} />
+              </div>
+            </div>
+          </div>
+          <OrderFilters />
+        </div>
+      </div>
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent">
@@ -196,6 +245,47 @@ export const AllOrdersTable = () => {
           ))}
         </TableBody>
       </Table>
+
+      <div className="flex justify-end my-8">
+        <div>
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() => setCurrentPage((prev) => prev - 1)}
+                  className={
+                    currentPage === 1
+                      ? "pointer-events-none opacity-50"
+                      : "cursor-pointer"
+                  }
+                />
+              </PaginationItem>
+              {Array.from({ length: totalPage }, (_, index) => index + 1).map(
+                (page) => (
+                  <PaginationItem
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                  >
+                    <PaginationLink isActive={currentPage === page}>
+                      {page}
+                    </PaginationLink>
+                  </PaginationItem>
+                )
+              )}
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() => setCurrentPage((prev) => prev + 1)}
+                  className={
+                    currentPage === totalPage
+                      ? "pointer-events-none opacity-50"
+                      : "cursor-pointer"
+                  }
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      </div>
 
       <UpdateAlertDialog
         openDialog={openDialog}
