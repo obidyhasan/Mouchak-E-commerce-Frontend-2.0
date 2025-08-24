@@ -1,17 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import DeleteAlertDialog from "@/components/DeleteAlertDialog";
 import { Button } from "@/components/ui/button";
-import {
-  galleryApi,
-  useDeleteImageMutation,
-} from "@/redux/features/gallery/gallery.api";
-import type { IErrorResponse } from "@/types";
+import { galleryApi } from "@/redux/features/gallery/gallery.api";
+import { useDeleteMouwalImageMutation } from "@/redux/features/mouwalGallery/mouwalGallery.api";
 import { Trash2 } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
 
 const ImageCard = ({ gallery }: any) => {
-  const [deleteImage] = useDeleteImageMutation();
+  const [deleteImage] = useDeleteMouwalImageMutation();
   const dispatch = useDispatch();
 
   const handleImageDelete = async (id: string) => {
@@ -20,9 +17,9 @@ const ImageCard = ({ gallery }: any) => {
       await deleteImage(id).unwrap();
       dispatch(galleryApi.util.resetApiState());
       toast.success("Image deleted successfully", { id: toastId });
-    } catch (err: unknown) {
-      console.error(err);
-      toast.error((err as IErrorResponse).message || "Something went wrong", {
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error.data.message || error.data || "Something went wrong", {
         id: toastId,
       });
     }
