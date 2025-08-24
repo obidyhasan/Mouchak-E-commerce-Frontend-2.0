@@ -36,7 +36,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <SidebarMenu>
                 {item.items.map((item) => (
                   <SidebarMenuItem
-                    className="bg-background border rounded-md my-1 p-1"
+                    className="bg-muted rounded-md p-1 font-medium border my-1"
                     key={item.title}
                   >
                     <SidebarMenuButton asChild>

@@ -11,7 +11,7 @@ type GalleryItem = {
   image: string;
 };
 
-const GallerySlider = () => {
+const MouwalGallerySlider = () => {
   const { data = [], isLoading } = useGetImagesQuery(undefined);
   const dispatch = useDispatch();
 
@@ -75,7 +75,7 @@ const GallerySlider = () => {
       <div className="relative my-10 overflow-hidden w-full">
         {/* Slider Track */}
         <div
-          className="flex transition-transform duration-700 ease-linear gap-2"
+          className="flex transition-transform duration-700 ease-linear gap-2 "
           style={{
             transform: `translateX(-${currentIndex * slideWidth}px)`,
           }}
@@ -124,4 +124,4 @@ const GallerySlider = () => {
   );
 };
 
-export default GallerySlider;
+export default MouwalGallerySlider;

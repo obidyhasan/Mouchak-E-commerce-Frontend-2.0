@@ -1,7 +1,11 @@
-import Gallery from "@/pages/admin/Gallery";
-import Orders from "@/pages/admin/Orders";
-import Products from "@/pages/admin/Products";
 import type { ISidebarItem } from "@/types";
+import { lazy } from "react";
+
+const FAQ = lazy(() => import("@/pages/admin/FAQ"));
+const Gallery = lazy(() => import("@/pages/admin/Gallery"));
+const Orders = lazy(() => import("@/pages/admin/Orders"));
+const Products = lazy(() => import("@/pages/admin/Products"));
+const MouwalGallery = lazy(() => import("@/pages/admin/MouwalGallery"));
 
 export const adminSidebarItems: ISidebarItem[] = [
   {
@@ -21,6 +25,16 @@ export const adminSidebarItems: ISidebarItem[] = [
         title: "Gallery",
         url: "/admin/gallery",
         component: Gallery,
+      },
+      {
+        title: "FAQ",
+        url: "/admin/faq",
+        component: FAQ,
+      },
+      {
+        title: "Mouwal Gallery",
+        url: "/admin/mouwal-gallery",
+        component: MouwalGallery,
       },
     ],
   },

@@ -87,7 +87,7 @@ const AddImageDialog = ({ children }: IProps) => {
                 disabled={!image || buttonDisable}
                 type="submit"
               >
-                Save Product
+                Save Image
               </Button>
             </DialogFooter>
           </DialogContent>

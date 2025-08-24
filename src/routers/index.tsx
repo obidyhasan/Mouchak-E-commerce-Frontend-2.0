@@ -1,22 +1,26 @@
-import App from "@/App";
-import DashboardLayout from "@/components/layouts/DashboardLayout";
-import Checkout from "@/pages/Checkout";
-import Home from "@/pages/Home";
-import Login from "@/pages/Login";
-import ProductDetails from "@/pages/ProductDetails";
-import MyOrders from "@/pages/user/MyOrders";
-import Profile from "@/pages/user/Profile";
-import Verify from "@/pages/Verify";
 import { generateRoutes } from "@/utils/generateRoutes";
 import { createBrowserRouter, Navigate } from "react-router";
 import { adminSidebarItems } from "./adminSidebarItems";
-import Unauthorized from "@/pages/Unauthorized";
 import { withAuth } from "@/utils/withAuth";
 import { Role } from "@/constants/role";
-import MyOrderCarts from "@/pages/user/MyOrderCarts";
-import OrderDetails from "@/pages/admin/OrderDetails";
-import UpdateProduct from "@/pages/admin/UpdateProduct";
-import About from "@/pages/About";
+import { lazy } from "react";
+
+const App = lazy(() => import("@/App"));
+const About = lazy(() => import("@/pages/About"));
+const Home = lazy(() => import("@/pages/Home"));
+const Login = lazy(() => import("@/pages/Login"));
+const Profile = lazy(() => import("@/pages/user/Profile"));
+const Verify = lazy(() => import("@/pages/Verify"));
+const ProductDetails = lazy(() => import("@/pages/ProductDetails"));
+const MyOrders = lazy(() => import("@/pages/user/MyOrders"));
+const Checkout = lazy(() => import("@/pages/Checkout"));
+const MyOrderCarts = lazy(() => import("@/pages/user/MyOrderCarts"));
+const OrderDetails = lazy(() => import("@/pages/admin/OrderDetails"));
+const UpdateProduct = lazy(() => import("@/pages/admin/UpdateProduct"));
+const Unauthorized = lazy(() => import("@/pages/Unauthorized"));
+const DashboardLayout = lazy(
+  () => import("@/components/layouts/DashboardLayout")
+);
 
 export const router = createBrowserRouter([
   {
