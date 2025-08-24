@@ -4,7 +4,7 @@ import {
   LogOutIcon,
   UserPenIcon,
 } from "lucide-react";
-import { LuUserRound } from "react-icons/lu";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,6 +31,7 @@ import { Role } from "@/constants/role";
 import { authApi, useLogoutMutation } from "@/redux/features/auth/auth.api";
 import { useDispatch } from "react-redux";
 import { useState } from "react";
+import { Button } from "./button";
 
 export default function UserMenu() {
   const userInfo = useUser();
@@ -38,6 +39,8 @@ export default function UserMenu() {
   const dispatch = useDispatch();
 
   const [openDialog, setOpenDialog] = useState(false);
+
+  const firstChar = userInfo?.email[0] as string;
 
   const handleLogout = async () => {
     await logout(undefined);
@@ -48,9 +51,12 @@ export default function UserMenu() {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <div className="p-2 hover:text-primary cursor-pointer transition-colors duration-200 h-auto rounded-full hover:bg-transparent">
-            <LuUserRound className="w-5 h-5" />
-          </div>
+          <Button
+            size={"icon"}
+            className="bg-primary rounded-full flex items-center justify-center"
+          >
+            <p className="text-lg text-center">{firstChar.toUpperCase()}</p>
+          </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="max-w-64" align="end">
           <DropdownMenuLabel className="flex min-w-0 flex-col">

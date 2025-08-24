@@ -29,8 +29,9 @@ import {
   useUpdateUserMutation,
   useUserInfoQuery,
 } from "@/redux/features/auth/auth.api";
+import { clearBuyNow, selectBuyNow } from "@/redux/features/buyNow/buyNowSlice";
 import { useAddCartMutation } from "@/redux/features/cart/cart.api";
-import { selectCarts } from "@/redux/features/cart/CartSlice";
+import { clearCart, selectCarts } from "@/redux/features/cart/CartSlice";
 import { setLoading } from "@/redux/features/loadingSlice";
 import { useAddOrderMutation } from "@/redux/features/order/order.api";
 import { useAppDispatch } from "@/redux/hook";
@@ -39,7 +40,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { toast } from "sonner";
 import z from "zod";
 
@@ -78,10 +79,13 @@ const Checkout = () => {
   const [email, setEmail] = useState("");
   const [checkbox, setCheckbox] = useState(false);
   const carts = useSelector(selectCarts);
+  const buyNow = useSelector(selectBuyNow);
   const [addCart] = useAddCartMutation();
   const [addOrder] = useAddOrderMutation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const location = useLocation();
+  const isBuyNow = location?.state === "BuyNow";
 
   const form = useForm<z.infer<typeof userSchema>>({
     resolver: zodResolver(userSchema),
@@ -95,10 +99,10 @@ const Checkout = () => {
   });
 
   useEffect(() => {
-    if (carts.length === 0) {
+    if (carts.length === 0 && !isBuyNow) {
       navigate("/", { replace: true });
     }
-  }, [carts, navigate]);
+  }, [carts, navigate, isBuyNow]);
 
   useEffect(() => {
     if (userInfo) {
@@ -117,23 +121,37 @@ const Checkout = () => {
   }, [isLoading, dispatch]);
 
   useEffect(() => {
-    if (carts.length > 1) {
-      setShippingCost(0);
-      setShippingStyle(
-        "text-primary flex items-center justify-between gap-5 text-base font-medium"
-      );
-    } else if (carts.length === 1 && carts[0].quantity > 1) {
-      setShippingCost(0);
-      setShippingStyle(
-        "text-primary flex items-center justify-between gap-5 text-base font-medium"
-      );
+    if (isBuyNow) {
+      if (isBuyNow && (buyNow?.quantity as number) > 1) {
+        setShippingCost(0);
+        setShippingStyle(
+          "text-primary flex items-center justify-between gap-5 text-base font-medium"
+        );
+      } else {
+        setShippingCost(60);
+        setShippingStyle(
+          "flex items-center justify-between gap-5 text-base font-medium"
+        );
+      }
     } else {
-      setShippingCost(60);
-      setShippingStyle(
-        "flex items-center justify-between gap-5 text-base font-medium"
-      );
+      if (carts.length > 1) {
+        setShippingCost(0);
+        setShippingStyle(
+          "text-primary flex items-center justify-between gap-5 text-base font-medium"
+        );
+      } else if (carts.length === 1 && carts[0].quantity > 1) {
+        setShippingCost(0);
+        setShippingStyle(
+          "text-primary flex items-center justify-between gap-5 text-base font-medium"
+        );
+      } else {
+        setShippingCost(60);
+        setShippingStyle(
+          "flex items-center justify-between gap-5 text-base font-medium"
+        );
+      }
     }
-  }, [carts]);
+  }, [carts, buyNow, isBuyNow]);
 
   const onSubmit = async (data: z.infer<typeof userSchema>) => {
     setButtonDisable(true);
@@ -165,20 +183,33 @@ const Checkout = () => {
   };
 
   // calculate total price
-  const totalPrice = carts.reduce((acc, item) => {
-    return acc + item.price * item.quantity;
-  }, 0);
+  let totalPrice = 0;
+  if (isBuyNow) {
+    totalPrice = Number(buyNow?.quantity) * Number(buyNow?.price);
+  } else {
+    totalPrice = carts.reduce((acc, item) => {
+      return acc + item.price * item.quantity;
+    }, 0);
+  }
 
   const handleConfirmOrder = async (toastId: any) => {
     try {
       const cartIds = [];
 
-      for (const item of carts) {
+      if (isBuyNow) {
         const res = await addCart({
-          product: item?.id,
-          quantity: item?.quantity,
+          product: buyNow?.id,
+          quantity: buyNow?.quantity,
         }).unwrap();
         cartIds.push(res?.data?._id);
+      } else {
+        for (const item of carts) {
+          const res = await addCart({
+            product: item?.id,
+            quantity: item?.quantity,
+          }).unwrap();
+          cartIds.push(res?.data?._id);
+        }
       }
 
       const orderResult = await addOrder({
@@ -186,6 +217,11 @@ const Checkout = () => {
         shippingCost: shippingCost,
       }).unwrap();
       if (orderResult.success) {
+        if (isBuyNow) {
+          dispatch(clearBuyNow());
+        } else {
+          dispatch(clearCart());
+        }
         toast.success("You Order is Confirmed", { id: toastId });
         setOrderConfirmOpen(true);
       }
@@ -355,9 +391,17 @@ const Checkout = () => {
           <h2 className="text-lg font-semibold">Your Order</h2>
           <div>
             <div className="flex flex-col gap-3 mt-4">
-              {carts?.map((item) => (
-                <CheckoutItemCard key={item?.id} item={item} />
-              ))}
+              {isBuyNow ? (
+                <>
+                  <CheckoutItemCard key={buyNow?.id} item={buyNow} />
+                </>
+              ) : (
+                <>
+                  {carts?.map((item) => (
+                    <CheckoutItemCard key={item?.id} item={item} />
+                  ))}
+                </>
+              )}
 
               <div className="flex items-center justify-between gap-5 text-base font-medium">
                 <p>Subtotal</p>

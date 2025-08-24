@@ -118,12 +118,14 @@ const Profile = () => {
   };
 
   return (
-    <div className="border p-4 rounded-md mt-6 space-y-3">
+    <div>
       <div className="max-w-7xl mx-auto px-4 py-4 md:py-10">
         <div>
-          <h1 className="font-medium text-lg md:text-xl ">Profile</h1>
+          <h1 className="font-medium text-lg md:text-xl text-center">
+            Profile
+          </h1>
 
-          <div className="border p-4 rounded-md mt-6 space-y-3">
+          <div className="border p-4 rounded-md mt-6 space-y-3 max-w-2xl mx-auto">
             <div className="border-b pb-2">
               <p className="text-sm mb-1 text-muted-foreground">Name</p>
               <h2>{user?.name}</h2>
@@ -147,140 +149,144 @@ const Profile = () => {
           </div>
 
           {/* Dialog */}
-          <Dialog open={open} onOpenChange={setOpen}>
-            <form>
-              <DialogTrigger asChild>
-                <Button className="mt-5">Edit Profile</Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                  <DialogTitle>Edit profile</DialogTitle>
-                  <DialogDescription>
-                    Make changes to your profile here. Click save when
-                    you&apos;re done.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4">
-                  <Form {...form}>
-                    <form
-                      id="user-edit-form"
-                      onSubmit={form.handleSubmit(onSubmit)}
-                      className="space-y-5"
+          <div className="max-w-2xl mx-auto text-center">
+            <Dialog open={open} onOpenChange={setOpen}>
+              <form>
+                <DialogTrigger asChild>
+                  <Button className="mt-5">Edit Profile</Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>Edit profile</DialogTitle>
+                    <DialogDescription>
+                      Make changes to your profile here. Click save when
+                      you&apos;re done.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid gap-4">
+                    <Form {...form}>
+                      <form
+                        id="user-edit-form"
+                        onSubmit={form.handleSubmit(onSubmit)}
+                        className="space-y-5"
+                      >
+                        <FormField
+                          control={form.control}
+                          name="name"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="pb-1">Name</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="Jon Deo"
+                                  type="text"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormDescription className="sr-only">
+                                This is your public display name.
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="phone"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="pb-1">
+                                Phone Number
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="01XXX-XXXXXX"
+                                  type="text"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormDescription className="sr-only">
+                                This is your public display email.
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="division"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="pb-1">Division</FormLabel>
+                              <FormControl className="">
+                                <Select
+                                  defaultValue={user?.division}
+                                  onValueChange={field.onChange}
+                                  {...field.onBlur}
+                                  {...field.onChange}
+                                >
+                                  <FormControl className="w-full">
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select your Division" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    {divisions.map((division, idx) => (
+                                      <SelectItem key={idx} value={division}>
+                                        {division}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </FormControl>
+                              <FormDescription className="sr-only">
+                                This is your public display email.
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="address"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="pb-1">Address</FormLabel>
+                              <FormControl>
+                                <Textarea
+                                  placeholder="Delivery address"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormDescription className="sr-only">
+                                This is your public display email.
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </form>
+                    </Form>
+                  </div>
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button variant="outline">Cancel</Button>
+                    </DialogClose>
+                    <Button
+                      disabled={buttonDisable}
+                      form="user-edit-form"
+                      type="submit"
                     >
-                      <FormField
-                        control={form.control}
-                        name="name"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="pb-1">Name</FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="Jon Deo"
-                                type="text"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormDescription className="sr-only">
-                              This is your public display name.
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="phone"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="pb-1">Phone Number</FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="01XXX-XXXXXX"
-                                type="text"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormDescription className="sr-only">
-                              This is your public display email.
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="division"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="pb-1">Division</FormLabel>
-                            <FormControl className="">
-                              <Select
-                                defaultValue={user?.division}
-                                onValueChange={field.onChange}
-                                {...field.onBlur}
-                                {...field.onChange}
-                              >
-                                <FormControl className="w-full">
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select your Division" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  {divisions.map((division, idx) => (
-                                    <SelectItem key={idx} value={division}>
-                                      {division}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </FormControl>
-                            <FormDescription className="sr-only">
-                              This is your public display email.
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="address"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="pb-1">Address</FormLabel>
-                            <FormControl>
-                              <Textarea
-                                placeholder="Delivery address"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormDescription className="sr-only">
-                              This is your public display email.
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </form>
-                  </Form>
-                </div>
-                <DialogFooter>
-                  <DialogClose asChild>
-                    <Button variant="outline">Cancel</Button>
-                  </DialogClose>
-                  <Button
-                    disabled={buttonDisable}
-                    form="user-edit-form"
-                    type="submit"
-                  >
-                    Save changes
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </form>
-          </Dialog>
+                      Save changes
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </form>
+            </Dialog>
+          </div>
         </div>
       </div>
     </div>

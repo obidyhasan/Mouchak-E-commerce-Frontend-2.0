@@ -1,8 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useGetImagesQuery } from "@/redux/features/gallery/gallery.api";
 import { useDispatch } from "react-redux";
 import { setLoading } from "@/redux/features/loadingSlice";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type GalleryItem = {
   _id: string;
@@ -13,74 +15,114 @@ const GallerySlider = () => {
   const { data = [], isLoading } = useGetImagesQuery(undefined);
   const dispatch = useDispatch();
 
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
   useEffect(() => {
     dispatch(setLoading(isLoading));
   }, [isLoading, dispatch]);
 
-  // If you have only a few images, repeat them so the loop feels continuous
+  // Repeat items if less than 6, then duplicate for smooth loop
   const base = useMemo<GalleryItem[]>(() => {
     if (!data.length) return [];
     if (data.length >= 6) return data;
-    // repeat to make the strip long enough
     const repeat = Math.ceil(6 / data.length);
     return Array.from({ length: repeat })
       .flatMap(() => data)
       .slice(0, Math.max(6, data.length * repeat));
   }, [data]);
 
-  // Duplicate once to create a seamless loop (total width = 2x)
   const marqueeItems = useMemo(() => [...base, ...base], [base]);
 
-  // Speed: longer strip -> longer duration (tweak multiplier as you like)
-  const durationSeconds = Math.max(20, base.length * 5); // e.g., 20s–60s+
+  const slideWidth = 320 + 8; // width + gap
+
+  // --- Auto Scroll ---
+  const startAutoScroll = () => {
+    if (intervalRef.current) return;
+    intervalRef.current = setInterval(() => {
+      setCurrentIndex((prev) => (prev === base.length ? 0 : prev + 1));
+    }, 2000); // 2s
+  };
+
+  const stopAutoScroll = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  };
+
+  useEffect(() => {
+    if (base.length > 1) {
+      startAutoScroll();
+    }
+    return () => stopAutoScroll();
+  }, [base]);
+
+  const handlePrev = () => {
+    stopAutoScroll();
+    setCurrentIndex((prev) => (prev === 0 ? base.length : prev - 1));
+    startAutoScroll();
+  };
+
+  const handleNext = () => {
+    stopAutoScroll();
+    setCurrentIndex((prev) => (prev === base.length ? 0 : prev + 1));
+    startAutoScroll();
+  };
 
   return (
-    <div className="mt-10 overflow-hidden cursor-pointer">
-      {/* Inline styles for the marquee animation */}
-      <style>{`
-        @keyframes marquee-scroll {
-          from { transform: translateX(0); }
-          to   { transform: translateX(-50%); } /* shift by one copy width */
-        }
-        .marquee-track {
-          display: flex;
-          gap: 8px;
-          width: max-content;               /* fit content so -50% is one full copy */
-          animation-name: marquee-scroll;
-          animation-timing-function: linear;
-          animation-iteration-count: infinite;
-          animation-duration: var(--marquee-duration, 40s);
-          will-change: transform;           /* smoother on most browsers */
-        }
-        .marquee-track:hover {
-          animation-play-state: paused;     /* pause on hover */
-        }
-      `}</style>
-
+    <div>
       <div
-        className="marquee-track"
-        style={{ ["--marquee-duration" as any]: `${durationSeconds}s` }}
+        className="relative my-10 overflow-hidden w-full"
+        onMouseEnter={stopAutoScroll}
+        onMouseLeave={startAutoScroll}
       >
-        {marqueeItems.map((gallery: GalleryItem, idx: number) => (
-          <div
-            key={`${gallery._id}-${idx}`}
-            className="shrink-0"
-            // choose widths that look good for your design; keep them consistent
-            // to avoid jitter. You can also use a single fixed width if preferred.
-            style={{
-              width: "320px", // <- adjust to taste (e.g., 280/320/360)
-              height: "384px", // h-96
-            }}
+        {/* Slider Track */}
+        <div
+          className="flex transition-transform duration-700 ease-linear gap-2 cursor-pointer"
+          style={{
+            transform: `translateX(-${currentIndex * slideWidth}px)`,
+          }}
+        >
+          {marqueeItems.map((gallery: GalleryItem, idx: number) => (
+            <div
+              key={`${gallery._id}-${idx}`}
+              className="shrink-0"
+              style={{
+                width: "320px",
+                height: "384px",
+              }}
+            >
+              <img
+                src={gallery.image}
+                alt="gallery"
+                className="w-full h-full object-cover rounded-md"
+                loading="lazy"
+                draggable={false}
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="flex items-center justify-center gap-2 my-4">
+          {/* Prev Button */}
+          <Button
+            size={"icon"}
+            onClick={handlePrev}
+            className="hover:scale-110 transition"
           >
-            <img
-              src={gallery.image}
-              alt="gallery"
-              className="w-full h-full object-cover rounded-md"
-              loading="lazy"
-              draggable={false}
-            />
-          </div>
-        ))}
+            <ChevronLeft className="h-6 w-6" />
+          </Button>
+
+          {/* Next Button */}
+          <Button
+            size={"icon"}
+            onClick={handleNext}
+            className=" hover:scale-110 transition"
+          >
+            <ChevronRight className="h-6 w-6" />
+          </Button>
+        </div>
       </div>
     </div>
   );

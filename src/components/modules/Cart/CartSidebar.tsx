@@ -37,7 +37,7 @@ export function CartSidebar() {
 
       <SheetTrigger asChild>
         <div className="relative" aria-label="Open cart">
-          <div className="p-2 hover:text-primary cursor-pointer transition-colors duration-200 h-auto rounded-full hover:bg-transparent">
+          <div className=" p-2 hover:text-primary cursor-pointer transition-colors duration-200 h-auto rounded-full hover:bg-transparent">
             <FiShoppingCart className="w-5 h-5" />
           </div>
           <Badge className=" border-background rounded-full w-5 h-5 absolute -top-0.5 left-full text-xs -translate-x-3.5 px-1">

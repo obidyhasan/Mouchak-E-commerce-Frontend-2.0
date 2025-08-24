@@ -144,18 +144,18 @@ export default function Navbar() {
         </div>
 
         {/* Right side: Actions */}
-        <div className="flex flex-1 items-center justify-end gap-2">
+        <div className="flex flex-1 items-center justify-end gap-4">
+          <CartSidebar />
           {userInfo ? (
             <UserMenu />
           ) : (
             <div
               onClick={goToLoginPage}
-              className="p-2 hover:text-primary cursor-pointer transition-colors duration-200 h-auto rounded-full hover:bg-transparent"
+              className="p-2 border hover:text-primary cursor-pointer transition-colors duration-200 h-auto rounded-full hover:bg-transparent"
             >
               <LuUserRound className="w-5 h-5" />
             </div>
           )}
-          <CartSidebar />
         </div>
       </div>
     </header>

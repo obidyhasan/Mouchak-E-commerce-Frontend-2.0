@@ -7,20 +7,20 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { clearCart } from "@/redux/features/cart/CartSlice";
 
 import successImg from "@/assets/images/success_img.png";
-import { useDispatch } from "react-redux";
+
+import { useNavigate } from "react-router";
 
 interface IProps {
   open: boolean;
 }
 
 export function OrderConfirmDialog({ open }: IProps) {
-  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleBackToHome = () => {
-    dispatch(clearCart());
+    navigate("/me/orders", { replace: true });
   };
 
   return (

@@ -44,6 +44,18 @@ const Home = () => {
 
         <GallerySlider />
       </section>
+      {/* Mouwal Section */}
+      <section>
+        <div className="max-w-7xl mx-auto px-4 w-full">
+          {" "}
+          <SectionHeader
+            title="Our Mouwal Gallery"
+            subTitle="Discover moments captured through our journey. Explore a collection of visuals that reflect the beauty, creativity, and essence of Mouwal."
+          />
+        </div>
+
+        <GallerySlider />
+      </section>
     </div>
   );
 };

@@ -2,6 +2,7 @@
 import ProductCard from "@/components/modules/Home/ProductCard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { setBuyNow } from "@/redux/features/buyNow/buyNowSlice";
 import { addCart } from "@/redux/features/cart/CartSlice";
 import { setLoading } from "@/redux/features/loadingSlice";
 import {
@@ -11,13 +12,14 @@ import {
 import { useAppDispatch } from "@/redux/hook";
 import { useEffect, useState } from "react";
 import { FiMinus, FiPlus, FiShoppingCart } from "react-icons/fi";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
 
 const ProductDetails = () => {
   const { slug } = useParams();
   const [quantity, setQuantity] = useState(1);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const { data: product, isLoading: singleProductLoading } =
     useGetSingleProductQuery(slug as string);
@@ -48,6 +50,19 @@ const ProductDetails = () => {
       })
     );
     toast.success("Product added to cart");
+  };
+
+  const handleBuyNow = () => {
+    dispatch(
+      setBuyNow({
+        id: product?._id,
+        name: product?.name,
+        price: product?.price,
+        quantity: quantity,
+        image: product?.image,
+      })
+    );
+    navigate("/checkout", { state: "BuyNow" });
   };
 
   return (
@@ -99,12 +114,22 @@ const ProductDetails = () => {
                 <FiPlus />
               </Button>
             </div>
+          </div>
 
+          <div className="flex flex-wrap gap-3">
             <Button
+              variant={"outline"}
               onClick={handleAddToCart}
-              className="text-center rounded-sm bg-primary p-2 text-xs sm:text-sm font-medium transition hover:scale-103"
+              className="text-center rounded-sm px-4 text-xs sm:text-sm font-medium transition hover:scale-103"
             >
               <FiShoppingCart /> Add to Cart
+            </Button>
+            <Button
+              variant={"default"}
+              onClick={handleBuyNow}
+              className="text-center rounded-sm px-4 text-xs sm:text-sm font-medium transition hover:scale-103"
+            >
+              Buy Now
             </Button>
           </div>
 

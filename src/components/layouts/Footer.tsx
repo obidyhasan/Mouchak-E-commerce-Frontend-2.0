@@ -1,57 +1,67 @@
 import Logo from "@/assets/icons/Logo";
+import facebook from "@/assets/icons/socialIcons/facebook.png";
+import instagram from "@/assets/icons/socialIcons/instagram.png";
+import whatsapp from "@/assets/icons/socialIcons/whatsapp.png";
+import youtube from "@/assets/icons/socialIcons/youtube.png";
 import { Link } from "react-router";
 
 const Footer = () => {
   return (
-    <div>
-      <footer className="bg-background text-foreground border-t border-border">
-        <div className="mx-auto max-w-7xl px-4 py-7 pt-10">
-          <div className="lg:flex lg:items-end lg:justify-between">
-            <div>
-              <div className="flex justify-center lg:justify-start">
-                <Logo />
-              </div>
-              <p className="mx-auto mt-6 max-w-md leading-relaxed text-muted-foreground text-sm sm:text-base lg:text-left text-justify">
-                Pure, natural honey delivered from the hive to your home. Taste
-                the sweetness of nature with our premium, sustainably sourced
-                honey products.
-              </p>
-            </div>
+    <footer className="bg-background border-t border-border">
+      <div className="mx-auto max-w-7xl px-4 py-10">
+        <div className="flex justify-center items-center gap-2">
+          <Logo />
+          <h1 className="text-2xl font-bold text-foreground">Mouchak</h1>
+        </div>
 
-            <ul className="mt-12 flex flex-wrap justify-center gap-6 md:gap-8 lg:mt-0 lg:justify-end lg:gap-12">
-              <li>
-                <Link
-                  className="transition hover:text-muted-foreground"
-                  to="/about"
-                >
-                  About
-                </Link>
-              </li>
-              <li>
-                <Link
-                  className="transition hover:text-muted-foreground"
-                  to="/support"
-                >
-                  Support
-                </Link>
-              </li>
-              <li>
-                <Link
-                  className="transition hover:text-muted-foreground"
-                  to="/terms"
-                >
-                  Term & Condition
-                </Link>
-              </li>
-            </ul>
-          </div>
+        <p className="mx-auto mt-6 max-w-2xl text-center text-sm leading-relaxed text-muted-foreground">
+          Pure, natural honey delivered from the hive to your home. Taste the
+          sweetness of nature with our premium, sustainably sourced honey
+          products.
+        </p>
 
-          <p className="mt-6 text-center text-sm text-muted-foreground lg:text-right">
-            Copyright &copy; Mouchak 2025. All rights reserved.
+        {/* Social Links */}
+        <ul className="mt-8 flex flex-wrap justify-center gap-5">
+          <li>
+            <Link
+              className="w-10 h-10 text-foreground/80 transition hover:text-foreground"
+              to={"/"}
+            >
+              <img src={facebook} alt="facebook" className="w-6 h-6" />
+            </Link>
+          </li>
+          <li>
+            <Link
+              className="w-10 h-10 text-foreground/80 transition hover:text-foreground"
+              to={"/"}
+            >
+              <img src={instagram} alt="instagram" className="w-6 h-6" />
+            </Link>
+          </li>
+          <li>
+            <Link
+              className="w-10 h-10 text-foreground/80 transition hover:text-foreground"
+              to={"/"}
+            >
+              <img src={youtube} alt="youtube" className="w-6 h-6" />
+            </Link>
+          </li>
+          <li>
+            <Link
+              className="w-10 h-10 text-foreground/80 transition hover:text-foreground"
+              to={"/"}
+            >
+              <img src={whatsapp} alt="whatsapp" className="w-6 h-6" />
+            </Link>
+          </li>
+        </ul>
+        <div>
+          <p className="text-center mt-6 -mb-5 text-muted-foreground text-sm">
+            © 2025 Mouchak. All Right Reserved
           </p>
         </div>
-      </footer>
-    </div>
+      </div>
+    </footer>
   );
 };
 
