@@ -1,6 +1,7 @@
 import bannerImage from "@/assets/images/banner-4.jpg";
 import FAQAccordion from "@/components/modules/Home/FAQAccordion";
 import GallerySlider from "@/components/modules/Home/GallerySlider";
+import MouwalGallerySlider from "@/components/modules/Home/MouwalGallerySlider";
 import ProductsSection from "@/components/modules/Home/ProductsSection";
 import SectionHeader from "@/components/modules/Home/SectionHeader";
 
@@ -54,7 +55,7 @@ const Home = () => {
           />
         </div>
 
-        <GallerySlider />
+        <MouwalGallerySlider />
       </section>
     </div>
   );

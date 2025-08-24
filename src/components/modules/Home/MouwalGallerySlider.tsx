@@ -1,10 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useGetImagesQuery } from "@/redux/features/gallery/gallery.api";
-import { useDispatch } from "react-redux";
 import { setLoading } from "@/redux/features/loadingSlice";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useGetMouwalImagesQuery } from "@/redux/features/mouwalGallery/mouwalGallery.api";
+import { useAppDispatch } from "@/redux/hook";
 
 type GalleryItem = {
   _id: string;
@@ -12,8 +12,8 @@ type GalleryItem = {
 };
 
 const MouwalGallerySlider = () => {
-  const { data = [], isLoading } = useGetImagesQuery(undefined);
-  const dispatch = useDispatch();
+  const { data = [], isLoading } = useGetMouwalImagesQuery(undefined);
+  const dispatch = useAppDispatch();
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
